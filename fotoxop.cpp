@@ -1,8 +1,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
-#include <algorithm>
 #include <iostream>
+#include <algorithm>
 #include <cmath>
+#include <string>
 
 // Turn the given image into grayscale
 void grayscale(SDL_Surface* surface) {
@@ -173,8 +174,11 @@ void mirrorHorizontal(SDL_Surface* surface) {
 
 int main(int argc, char* argv[]) {
   // Input and output image paths
-	char imagePath[100];
-	char outputPath[100];
+	/*char imagePath[100];
+	char outputPath[100];*/
+
+	std::string imagePath;
+	std::string outputPath;
 
 	// What operation the user wants to perform
 	int operation;
@@ -185,8 +189,6 @@ int main(int argc, char* argv[]) {
 	// Prompt user for file name
 	std::cout << "Enter the name of the original JPEG (with extension): ";
 	std::cin >> imagePath;
-	std::cout << "Enter a name for the new JPEG (with extension): ";
-	std::cin >> outputPath;
 	std::cout << "What operation do you want to perform?\n";
 	std::cout << "(1) Mirror horizontally\t(2) Mirror vertically\t";
 	std::cout << "(3) Grayscale\t(4) Quantize" << std::endl;
@@ -213,7 +215,7 @@ int main(int argc, char* argv[]) {
 
   // Create window
   SDL_Window* window_original = SDL_CreateWindow("Original Image",
-    100, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+    100, 300, 800, 600, SDL_WINDOW_SHOWN);
   if (window_original == nullptr) {
     std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
     IMG_Quit();
@@ -232,7 +234,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Load image
-  SDL_Surface* surface_original = IMG_Load(imagePath);
+  SDL_Surface* surface_original = IMG_Load(imagePath.c_str());
   if (surface_original == nullptr) {
     std::cerr << "Unable to load image " << imagePath << "! IMG_Error: " << IMG_GetError() << std::endl;
     SDL_DestroyRenderer(renderer_original);
@@ -294,22 +296,13 @@ int main(int argc, char* argv[]) {
 	default:
 		std::cout << "No valid operation selected. Saving unmodified image.";
 	}
-  
-  // Save modified image
-  int save_status = IMG_SaveJPG(surface_modified, outputPath, 100);
-  if (save_status != 0) {
-    std::cerr << "Unable to save image file! SDL_Error: " << IMG_GetError() << std::endl;
-    SDL_DestroyRenderer(renderer_original);
-    SDL_DestroyWindow(window_original);
-    IMG_Quit();
-    SDL_Quit();
-    return 1;
-  }
+
+
 
   // Render modified image
   // Create window
   SDL_Window* window_modified = SDL_CreateWindow("Modified Image",
-    900, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+    900, 300, 800, 600, SDL_WINDOW_SHOWN);
   if (window_modified == nullptr) {
     std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
     IMG_Quit();
@@ -347,11 +340,33 @@ int main(int argc, char* argv[]) {
   // Update the window
   SDL_RenderPresent(renderer_modified);
 
-
-  // Free the loaded surface
-  SDL_FreeSurface(surface_original);
-  SDL_FreeSurface(surface_modified);
+	std::cout << "Enter a name for the new JPEG (type N if you don't want to save): ";
+	std::cin >> outputPath;
   
+	if (outputPath != "N" && outputPath != "n") {
+		std::cout << "Saving image as " << outputPath << std::endl;
+
+		// Save modified image
+		int save_status = IMG_SaveJPG(surface_modified, outputPath.c_str(), 100);
+		if (save_status != 0) {
+			std::cerr << "Unable to save image file! SDL_Error: " << IMG_GetError() << std::endl;
+			SDL_DestroyRenderer(renderer_original);
+			SDL_DestroyWindow(window_original);
+			IMG_Quit();
+			SDL_Quit();
+			return 1;
+		}
+	}
+	else {
+		std::cout << "Saving skipped." << std::endl;
+	}
+
+	std::cout << "Program finished. Close this terminal to close the program." << std::endl;
+  
+	// Free the loaded surface
+	SDL_FreeSurface(surface_original);
+	SDL_FreeSurface(surface_modified);
+
   // Event loop
   bool running = true;
   SDL_Event event;
