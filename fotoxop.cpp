@@ -127,6 +127,8 @@ void mirrorVertical(SDL_Surface* surface) {
 
   memcpy(surface->pixels, new_pixels, image_size);
 
+	delete[] new_pixels;
+
   // Unlock the surface
   if (SDL_MUSTLOCK(surface)) {
     SDL_UnlockSurface(surface);
@@ -160,6 +162,8 @@ void mirrorHorizontal(SDL_Surface* surface) {
     }
 
     memcpy(surface->pixels, new_pixels, image_size);
+
+		delete[] new_pixels;
 
     // Unlock the surface
     if (SDL_MUSTLOCK(surface)) {
