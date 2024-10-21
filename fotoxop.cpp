@@ -292,8 +292,7 @@ int main(int argc, char* argv[]) {
 		break;
 
 	default:
-		std::cout << "Invalid operation.";
-		return 0;
+		std::cout << "No valid operation selected. Saving unmodified image.";
 	}
   
   // Save modified image
