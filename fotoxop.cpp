@@ -169,9 +169,31 @@ void mirrorHorizontal(SDL_Surface* surface) {
 
 int main(int argc, char* argv[]) {
   // Input and output image paths
-  const char* imagePath = "C:\\ericp\\fpi\\images\\Space_187k.jpg";
-  const char* outputPath = "C:\\ericp\\fpi\\images\\modified.jpg";
+	char imagePath[100];
+	char outputPath[100];
 
+	// What operation the user wants to perform
+	int operation;
+
+	// How many shades of gray to quantize the image
+	int shades;
+
+	// Prompt user for file name
+	std::cout << "Enter the name of the original JPEG (with extension): ";
+	std::cin >> imagePath;
+	std::cout << "Enter a name for the new JPEG (with extension): ";
+	std::cin >> outputPath;
+	std::cout << "What operation do you want to perform?\n";
+	std::cout << "(1) Mirror horizontally\t(2) Mirror vertically\t";
+	std::cout << "(3) Grayscale\t(4) Quantize" << std::endl;
+	std::cin >> operation;
+
+	// Quantize operation needs the number of shades of gray
+	if (operation == 4) {
+		std::cout << "How many shades of gray?: ";
+		std::cin >> shades;
+	}
+	
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
@@ -247,10 +269,28 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  grayscale(surface_modified);
-  quantize(surface_modified, 8);
-  mirrorHorizontal(surface_modified);
-  mirrorVertical(surface_modified);
+	// Select operation to perform
+	switch (operation) {
+	case 1:
+		mirrorHorizontal(surface_modified);
+		break;
+
+	case 2:
+		mirrorVertical(surface_modified);
+		break;
+
+	case 3:
+		grayscale(surface_modified);
+		break;
+
+	case 4:
+		quantize(surface_modified, shades);
+		break;
+
+	default:
+		std::cout << "Invalid operation.";
+		return 0;
+	}
   
   // Save modified image
   int save_status = IMG_SaveJPG(surface_modified, outputPath, 100);
