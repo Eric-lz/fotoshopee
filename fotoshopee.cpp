@@ -4,13 +4,23 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
-#include "SDLClass.h"
+#include "Window.h"
 
 int main(int argc, char* argv[]) {
 	std::string imagePath;
 	std::string outputPath;
 
-  SDLClass SDL;
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
+	}
+	// Initialize SDL_image
+	if (!(IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG)) {
+		std::cerr << "SDL_image could not initialize! IMG_Error: " << IMG_GetError() << std::endl;
+		SDL_Quit();
+	}
+
+  Window w_original;
 
 	// Get input filename
   // Prompt user for the name of the file
@@ -18,13 +28,13 @@ int main(int argc, char* argv[]) {
   std::cin >> imagePath;
 
   // Create window for the original image
-  SDL.createWindowOriginal();
+	w_original.createWindow("Original image");
 
   // Load image
-  SDL.loadImage(imagePath);
+	w_original.loadImage(imagePath);
 
   // Render window
-  SDL.renderOriginal();
+	w_original.render();
 
 
   // What operation the user wants to perform
@@ -45,46 +55,56 @@ int main(int argc, char* argv[]) {
     std::cin >> shades;
   }
 
+	Window w_modified;
+
+	// Create window for the modified image
+	w_modified.createWindow("Modified image");
+
+	// Duplicate image from original window
+	w_modified.copyImage(w_original);
+
 	// Select operation to perform
 	switch (operation) {
 	case 1:
-		SDL.mirrorHorizontal();
+		w_modified.mirrorHorizontal();
 		break;
 
 	case 2:
-    SDL.mirrorVertical();
+		w_modified.mirrorVertical();
 		break;
 
 	case 3:
-    SDL.grayscale();
+		w_modified.grayscale();
 		break;
 
 	case 4:
-    SDL.quantize(shades);
+		w_modified.quantize(shades);
 		break;
 
 	default:
 		std::cout << "No valid operation selected. Duplicating original image.\n";
 	}
 
-  // Create window for the modified image
-  SDL.createWindowModified();
-
   // Render new window
-  SDL.renderModified();
+	w_modified.render();
 
-  // Get filename to save the JPG to
+  // Prompt user to save the new JPG
 	std::cout << "Enter a name for the new JPG (type N if you don't want to save): ";
 	std::cin >> outputPath;
   
-	if (outputPath != "N" && outputPath != "n") {
-		std::cout << "Saving image as " << outputPath << std::endl;
-
-    SDL.saveModified(outputPath);
-	}
-	else {
+	// Skip saving if user types 'N' or 'n'
+	if (outputPath == "N" || outputPath == "n") {
 		std::cout << "Saving skipped." << std::endl;
 	}
+	else {
+		std::cout << "Saving image as " << outputPath << std::endl;
+
+		w_modified.saveImage(outputPath);
+	}
+
+	// Quit SDL
+	IMG_Quit();
+	SDL_Quit();
 
   return 0;
 }

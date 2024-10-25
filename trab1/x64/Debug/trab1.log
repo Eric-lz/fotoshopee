@@ -1,10 +1,7 @@
-﻿  fotoshopee.cpp
-  SDLClass.cpp
-C:\ericp\fpi\trab1\SDLClass.cpp(164,21): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\ericp\fpi\trab1\SDLClass.cpp(210,23): warning C4244: 'initializing': conversion from 'double' to 'Uint8', possible loss of data
-C:\ericp\fpi\trab1\SDLClass.cpp(215,25): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\ericp\fpi\trab1\SDLClass.cpp(216,29): warning C4244: 'initializing': conversion from 'float' to 'Uint8', possible loss of data
-C:\ericp\fpi\trab1\SDLClass.cpp(217,27): warning C4244: 'initializing': conversion from 'float' to 'Uint8', possible loss of data
-  Generating Code...
-  LINK : C:\ericp\fpi\trab1\x64\Debug\trab1.exe not found or not built by the last incremental link; performing full link
+﻿  Window.cpp
+C:\ericp\fpi\trab1\Window.cpp(117,21): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\ericp\fpi\trab1\Window.cpp(163,23): warning C4244: 'initializing': conversion from 'double' to 'Uint8', possible loss of data
+C:\ericp\fpi\trab1\Window.cpp(168,25): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\ericp\fpi\trab1\Window.cpp(169,29): warning C4244: 'initializing': conversion from 'float' to 'Uint8', possible loss of data
+C:\ericp\fpi\trab1\Window.cpp(170,27): warning C4244: 'initializing': conversion from 'float' to 'Uint8', possible loss of data
   trab1.vcxproj -> C:\ericp\fpi\trab1\x64\Debug\trab1.exe
