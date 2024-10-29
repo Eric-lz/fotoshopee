@@ -321,5 +321,79 @@ export void contrast(SDL_Surface* surface, float value) {
 
 // Equalize histogram
 export void equalize(SDL_Surface* surface) {
-	// TODO
+	// Lock the surface_modified for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Number of bytes per line
+	int pitch = surface->pitch;
+	int bytes_per_pixel = surface->format->BytesPerPixel;
+
+	// Number of pixels in the image
+	int num_pixels = surface->h * surface->w;
+
+	// Histograms
+	int hist[256] = { 0 };
+	int hist_cum[256] = { 0 };	// Cumulative histogram
+	double scaling = 255.0 / num_pixels; // Scaling factor
+
+	// Loop through each pixel to calculate histogram
+	for (int y = 0; y < surface->h; y++) {
+		for (int x = 0; x < surface->w; x++) {
+			// This image has 3 bytes per pixel
+			// Get to the first byte of the pixel and get the value from the next two bytes
+			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
+			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
+			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
+
+			// Get the RGBA components
+			Uint8 r, g, b;
+			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+
+			// Calculate luminance
+			int luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+			// Increment histogram
+			hist[luminance]++;
+		}
+	}
+
+	// Calculate cumulative histogram
+	hist_cum[0] = scaling * hist[0];
+	for (int i = 1; i < 255; i++) {
+		hist_cum[i] = hist_cum[i - 1] + scaling * hist[i];
+	}
+
+	// Loop through each pixel
+	for (int y = 0; y < surface->h; y++) {
+		for (int x = 0; x < surface->w; x++) {
+			// This image has 3 bytes per pixel
+			// Get to the first byte of the pixel and get the value from the next two bytes
+			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
+			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
+			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
+
+			// Get the RGBA components
+			Uint8 r, g, b;
+			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+
+			// Calculate new pixel value
+			r = hist_cum[r];
+			g = hist_cum[g];
+			b = hist_cum[b];
+
+			// Set the modified pixel back
+			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
+
+			pixel[2] = new_pixel_value >> 16;
+			pixel[1] = new_pixel_value >> 8;
+			pixel[0] = new_pixel_value;
+		}
+	}
+
+	// Unlock the surface
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_UnlockSurface(surface);
+	}
 }

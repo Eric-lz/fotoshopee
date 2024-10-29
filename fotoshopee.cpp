@@ -14,8 +14,14 @@ void initSDL();
 
 // Enum for the operations the user selects
 enum Options {
-	MIRRORH = 1, MIRRORV, GRAYSCALE, QUANTIZE,
-	INVERT, BRIGHTNESS, CONTRAST, EQUALIZE
+	MIRRORH = 1,
+	MIRRORV,
+	GRAYSCALE,
+	QUANTIZE,
+	INVERT,
+	BRIGHTNESS,
+	CONTRAST,
+	EQUALIZE
 };
 
 
@@ -70,45 +76,47 @@ int main(int argc, char* argv[]) {
 		// Duplicate image from original window
 		w_modified.copyImage(w_original);
 
+		// Get image (surface) from the window
+		auto image = w_modified.getSurface();
+
 		// Select operation to perform
 		switch (selection) {
 		case MIRRORH:
-			mirrorHorizontal(w_modified.getSurface());
+			mirrorHorizontal(image);
 			break;
 
 		case MIRRORV:
-			mirrorVertical(w_modified.getSurface());
+			mirrorVertical(image);
 			break;
 
 		case GRAYSCALE:
-			grayscale(w_modified.getSurface());
+			grayscale(image);
 			break;
 
 		case QUANTIZE:
 			std::cout << "How many shades of gray?: ";
 			std::cin >> value;
-			quantize(w_modified.getSurface(), value);
+			quantize(image, value);
 			break;
 
 		case INVERT:
-			invert(w_modified.getSurface());
+			invert(image);
 			break;
 
 		case BRIGHTNESS:
 			std::cout << "Brightness [-255, 255]: ";
 			std::cin >> value;
-			brightness(w_modified.getSurface(), value);
+			brightness(image, value);
 			break;
 
 		case CONTRAST:
 			std::cout << "Contrast (0, 255]: ";
 			std::cin >> value;
-			contrast(w_modified.getSurface(), value);
+			contrast(image, value);
 			break;
 
 		case EQUALIZE:
-			std::cout << "TODO" << std::endl;
-			equalize(w_modified.getSurface());
+			equalize(image);
 			break;
 
 		default:
