@@ -16,13 +16,13 @@ public:
 	// Create window
 	void createWindow(std::string name,
 		int pos_x = SDL_WINDOWPOS_UNDEFINED, int pos_y = SDL_WINDOWPOS_UNDEFINED,
-		int width = 800, int heigth = 600);
+		int width = 600, int heigth = 450);
 
 	// Load new image
 	void loadImage(std::string filename);
 
 	// Copy image surface from another window
-	void copyImage(const Window& window);
+	void copyImage(const Window& src);
 
 	// Render image
 	void render();
@@ -31,10 +31,10 @@ public:
 	void saveImage(std::string filename);
 
 private:
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	SDL_Surface* surface;
-	SDL_Texture* texture;
+	SDL_Window* window = nullptr;
+	SDL_Renderer* renderer = nullptr;
+	SDL_Surface* surface = nullptr;
+	SDL_Texture* texture = nullptr;
 
 	// Check if filename has .jpg extension
 	// Returns filename with extension

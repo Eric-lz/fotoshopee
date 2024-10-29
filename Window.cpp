@@ -53,10 +53,10 @@ void Window::loadImage(std::string filename)
 }
 
 // Copy image surface from another window
-void Window::copyImage(const Window& window)
+void Window::copyImage(const Window& src)
 {
 	// Duplicate surface_modified for the modified image
-	surface = SDL_DuplicateSurface(window.surface);
+	surface = SDL_DuplicateSurface(src.surface);
 	if (surface == nullptr) {
 		std::cerr << "Unable to copy image! SDL_Error: " << SDL_GetError() << std::endl;
 	}

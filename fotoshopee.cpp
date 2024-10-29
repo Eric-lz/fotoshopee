@@ -14,7 +14,8 @@ void initSDL();
 
 // Enum for the operations the user selects
 enum Options {
-	MIRRORH = 1, MIRRORV, GRAYSCALE, QUANTIZE
+	MIRRORH = 1, MIRRORV, GRAYSCALE, QUANTIZE,
+	INVERT, BRIGHTNESS, CONTRAST, EQUALIZE
 };
 
 
@@ -25,6 +26,9 @@ int main(int argc, char* argv[]) {
 	bool running = true;
 
 	do {
+		// Clear screen
+		system("cls");
+
 		// Get input filename
 		// Prompt user for the name of the file
 		std::string imagePath;
@@ -49,18 +53,15 @@ int main(int argc, char* argv[]) {
 
 		// Prompt user for the operation
 		std::cout << "What operation do you want to perform?\n";
-		std::cout << "(1) Mirror horizontally\t(2) Mirror vertically\t";
-		std::cout << "(3) Grayscale\t(4) Quantize" << std::endl;
+		std::cout << "(1) Mirror horizontally\n(2) Mirror vertically\n";
+		std::cout << "(3) Grayscale\n(4) Quantize\n";
+		std::cout << "(5) Invert\n(6) Brightness\n(7) Contrast\n";
+		std::cout << "(8) Equalize" << std::endl;
 		std::cin >> selectionInput;
 		selection = static_cast<Options>(selectionInput);	// Cast user input into enum
 
-		// Quantize operation needs the number of shades of gray
-		int shades;
-		if (selection == QUANTIZE) {
-			std::cout << "How many shades of gray?: ";
-			std::cin >> shades;
-		}
-
+		// Store user input for operations that require an argument
+		float value;
 
 		// Create window for the modified image
 		Window w_modified;
@@ -84,7 +85,30 @@ int main(int argc, char* argv[]) {
 			break;
 
 		case QUANTIZE:
-			quantize(w_modified.getSurface(), shades);
+			std::cout << "How many shades of gray?: ";
+			std::cin >> value;
+			quantize(w_modified.getSurface(), value);
+			break;
+
+		case INVERT:
+			invert(w_modified.getSurface());
+			break;
+
+		case BRIGHTNESS:
+			std::cout << "Brightness [-255, 255]: ";
+			std::cin >> value;
+			brightness(w_modified.getSurface(), value);
+			break;
+
+		case CONTRAST:
+			std::cout << "Contrast (0, 255]: ";
+			std::cin >> value;
+			contrast(w_modified.getSurface(), value);
+			break;
+
+		case EQUALIZE:
+			std::cout << "TODO" << std::endl;
+			equalize(w_modified.getSurface());
 			break;
 
 		default:
