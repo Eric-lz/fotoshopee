@@ -73,19 +73,19 @@ int main(int argc, char* argv[]) {
 	// Select operation to perform
 	switch (selection) {
 	case MIRRORH:
-		w_modified.mirrorHorizontal();
+		mirrorHorizontal(w_modified.getSurface());
 		break;
 
 	case MIRRORV:
-		w_modified.mirrorVertical();
+		mirrorVertical(w_modified.getSurface());
 		break;
 
 	case GRAYSCALE:
-		w_modified.grayscale();
+		grayscale(w_modified.getSurface());
 		break;
 
 	case QUANTIZE:
-		w_modified.quantize(shades);
+		quantize(w_modified.getSurface(), shades);
 		break;
 
 	default:

@@ -10,6 +10,9 @@ public:
 	Window();
 	~Window();
 
+	// Get surface from this window
+	SDL_Surface* getSurface();
+
 	// Create window
 	void createWindow(std::string name);
 
@@ -24,12 +27,6 @@ public:
 
 	// Save modified image
 	void saveImage(std::string filename);
-
-	// Operations
-	void grayscale();
-	void quantize(int levels);
-	void mirrorVertical();
-	void mirrorHorizontal();
 
 private:
 	SDL_Window* window;
