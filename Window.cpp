@@ -88,6 +88,7 @@ void Window::saveImage(std::string filename)
   }
 }
 
+
 // Operations
 // Turn the given image into grayscale
 void Window::grayscale() {
@@ -255,6 +256,7 @@ void Window::mirrorHorizontal() {
     SDL_UnlockSurface(surface);
   }
 }
+
 
 // Check if filename has .jpg extension
 // Returns filename with extension

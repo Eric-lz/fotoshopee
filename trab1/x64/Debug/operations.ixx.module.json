@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "trab1\\x64\\Debug\\operations.ixx.obj",
+            "outputs": [
+                "C:\\ericp\\fpi\\trab1\\trab1\\x64\\Debug\\vc143.pdb",
+                "trab1\\x64\\Debug\\",
+                "C:\\ericp\\fpi\\trab1\\trab1\\x64\\Debug\\operations.ixx.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "operations",
+                    "source-path": "c:\\ericp\\fpi\\trab1\\operations.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": []
+        }
+    ]
+}
