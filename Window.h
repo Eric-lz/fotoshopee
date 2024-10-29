@@ -14,7 +14,9 @@ public:
 	SDL_Surface* getSurface();
 
 	// Create window
-	void createWindow(std::string name);
+	void createWindow(std::string name,
+		int pos_x = SDL_WINDOWPOS_UNDEFINED, int pos_y = SDL_WINDOWPOS_UNDEFINED,
+		int width = 800, int heigth = 600);
 
 	// Load new image
 	void loadImage(std::string filename);

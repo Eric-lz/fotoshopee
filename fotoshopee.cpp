@@ -19,97 +19,106 @@ enum Options {
 
 
 int main(int argc, char* argv[]) {
-	std::string imagePath;
-	std::string outputPath;
-
 	// Initialize SDL
 	initSDL();
 
+	bool running = true;
 
-	// Get input filename
-  // Prompt user for the name of the file
-  std::cout << "Enter the name of a JPG file: ";
-  std::cin >> imagePath;
+	do {
+		// Get input filename
+		// Prompt user for the name of the file
+		std::string imagePath;
+		std::string outputPath;
+		std::cout << "Enter the name of a JPG file: ";
+		std::cin >> imagePath;
 
-  // Create window for the original image
-  Window w_original;
-	w_original.createWindow("Original image");
+		// Create window for the original image
+		Window w_original;
+		w_original.createWindow("Original image", 100, 500, 600, 450);
 
-  // Load image
-	w_original.loadImage(imagePath);
+		// Load image
+		w_original.loadImage(imagePath);
 
-  // Render window
-	w_original.render();
-
-
-  // What operation the user selected to perform
-  int userInput;
-	Options selection;
-
-  // How many shades of gray to quantize the image
-  int shades;
-
-  // Prompt user for the operation
-  std::cout << "What operation do you want to perform?\n";
-  std::cout << "(1) Mirror horizontally\t(2) Mirror vertically\t";
-  std::cout << "(3) Grayscale\t(4) Quantize" << std::endl;
-  std::cin >> userInput;
-	selection = static_cast<Options>(userInput);	// Cast user input into enum
-
-  // Quantize operation needs the number of shades of gray
-  if (selection == QUANTIZE) {
-    std::cout << "How many shades of gray?: ";
-    std::cin >> shades;
-  }
+		// Render window
+		w_original.render();
 
 
-	// Create window for the modified image
-	Window w_modified;
-	w_modified.createWindow("Modified image");
+		// What operation the user selected to perform
+		int selectionInput;
+		Options selection;
 
-	// Duplicate image from original window
-	w_modified.copyImage(w_original);
+		// Prompt user for the operation
+		std::cout << "What operation do you want to perform?\n";
+		std::cout << "(1) Mirror horizontally\t(2) Mirror vertically\t";
+		std::cout << "(3) Grayscale\t(4) Quantize" << std::endl;
+		std::cin >> selectionInput;
+		selection = static_cast<Options>(selectionInput);	// Cast user input into enum
 
-	// Select operation to perform
-	switch (selection) {
-	case MIRRORH:
-		mirrorHorizontal(w_modified.getSurface());
-		break;
-
-	case MIRRORV:
-		mirrorVertical(w_modified.getSurface());
-		break;
-
-	case GRAYSCALE:
-		grayscale(w_modified.getSurface());
-		break;
-
-	case QUANTIZE:
-		quantize(w_modified.getSurface(), shades);
-		break;
-
-	default:
-		std::cout << "No valid operation selected. Duplicating original image.\n";
-	}
-
-  // Render new window
-	w_modified.render();
+		// Quantize operation needs the number of shades of gray
+		int shades;
+		if (selection == QUANTIZE) {
+			std::cout << "How many shades of gray?: ";
+			std::cin >> shades;
+		}
 
 
-  // Prompt user to save the new JPG
-	std::cout << "Enter a name for the new JPG (type N if you don't want to save): ";
-	std::cin >> outputPath;
-  
-	// Skip saving if user types 'N' or 'n'
-	if (outputPath == "N" || outputPath == "n") {
-		std::cout << "Saving skipped." << std::endl;
-	}
-	else {
-		std::cout << "Saving image as " << outputPath << std::endl;
+		// Create window for the modified image
+		Window w_modified;
+		w_modified.createWindow("Modified image", 700, 500, 600, 450);
 
-		w_modified.saveImage(outputPath);
-	}
+		// Duplicate image from original window
+		w_modified.copyImage(w_original);
 
+		// Select operation to perform
+		switch (selection) {
+		case MIRRORH:
+			mirrorHorizontal(w_modified.getSurface());
+			break;
+
+		case MIRRORV:
+			mirrorVertical(w_modified.getSurface());
+			break;
+
+		case GRAYSCALE:
+			grayscale(w_modified.getSurface());
+			break;
+
+		case QUANTIZE:
+			quantize(w_modified.getSurface(), shades);
+			break;
+
+		default:
+			std::cout << "No valid operation selected. Duplicating original image.\n";
+		}
+
+		// Render new window
+		w_modified.render();
+
+
+		// Prompt user to save the new JPG
+		std::cout << "Enter a name for the new JPG (type N if you don't want to save): ";
+		std::cin >> outputPath;
+
+		// Skip saving if user types 'N' or 'n'
+		if (outputPath == "N" || outputPath == "n") {
+			std::cout << "Saving skipped." << std::endl;
+		}
+		else {
+			std::cout << "Saving image as " << outputPath << std::endl;
+
+			w_modified.saveImage(outputPath);
+		}
+
+		// Prompt user to quit or start over
+		std::string userContinue;
+		std::cout << "Do you want to open a new image? (Y/n): ";
+		std::cin >> userContinue;
+
+		if (userContinue.front() == 'n' || userContinue.front() == 'N') {
+			running = false;
+		}
+
+	} while (running);
 
 	// Quit SDL
 	IMG_Quit();

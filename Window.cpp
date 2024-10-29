@@ -21,10 +21,10 @@ SDL_Surface* Window::getSurface()
 }
 
 // Create window for original image
-void Window::createWindow(std::string name)
+void Window::createWindow(std::string name, int pos_x, int pos_y, int width, int heigth)
 {
 	window = SDL_CreateWindow(name.c_str(),
-    100, 300, 800, 600, SDL_WINDOW_SHOWN);
+		pos_x, pos_y, width, heigth, SDL_WINDOW_SHOWN);
   if (window == nullptr) {
     std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
   }
