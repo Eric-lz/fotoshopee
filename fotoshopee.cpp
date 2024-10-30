@@ -90,8 +90,6 @@ int main(int argc, char* argv[]) {
 
 			// Prompt user for the operation
 			printMenu();
-			// Flush buffer
-			flush();
 			std::cin.get(selection_input);
 			if (std::toupper(selection_input) == 'Q') {
 				selection = QUIT;
@@ -164,7 +162,7 @@ int main(int argc, char* argv[]) {
 				break;
 
 			default:
-				std::cout << "No valid operation selected. Duplicating original image.\n" + std::to_string(selection);
+				std::cout << "No valid operation selected. Duplicating original image.\n";
 			}
 
 			// Render modified image
@@ -177,7 +175,6 @@ int main(int argc, char* argv[]) {
 		// Prompt user to save the new JPG
 		char userSave;
 		std::cout << "Do you want to save the new image? (y/N): ";
-		// Flush buffer
 		flush();
 		std::cin.get(userSave);
 		if (std::toupper(userSave) == 'Y') {
@@ -193,7 +190,6 @@ int main(int argc, char* argv[]) {
 		// Prompt user to quit or start over
 		char userContinue;
 		std::cout << "Do you want to open a new image? (y/N): ";
-		// Flush buffer
 		flush();
 		std::cin.get(userContinue);
 		if (std::toupper(userContinue) != 'Y') {
