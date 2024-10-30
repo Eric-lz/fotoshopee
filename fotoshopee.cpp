@@ -13,6 +13,9 @@ import operations;
 // SDL library initialization
 void initSDL();
 
+// Print menu of available operations
+void printMenu();
+
 // Flush cin buffer
 void flush();
 
@@ -40,23 +43,6 @@ std::string Operations[] = {
 	"Contrast",
 	"Equalize"
 };
-
-// Print menu of available operations
-void printMenu() {
-	std::string line;
-	
-	std::cout << "What operation do you want to perform?\n";
-
-	// Append all available operations into line
-	for (int i = 0;  auto& op : Operations) {
-		line += "(" + std::to_string(i) + ") " + op + "\n";
-		i++;
-	}
-
-	std::cout << line;
-	std::cout << "(Q) Quit\n";
-	std::cout << "Select: ";
-}
 
 int main(int argc, char* argv[]) {
 	// Initialize SDL
@@ -233,6 +219,23 @@ void initSDL() {
 		std::cerr << "SDL_image could not initialize! IMG_Error: " << IMG_GetError() << std::endl;
 		SDL_Quit();
 	}
+}
+
+// Print menu of available operations
+void printMenu() {
+	std::string line;
+
+	std::cout << "What operation do you want to perform?\n";
+
+	// Append all available operations into line
+	for (int i = 0; auto & op : Operations) {
+		line += "(" + std::to_string(i) + ") " + op + "\n";
+		i++;
+	}
+
+	std::cout << line;
+	std::cout << "(Q) Quit\n";
+	std::cout << "Select: ";
 }
 
 // Flush std::cin
