@@ -5,14 +5,14 @@
         {
             "primary-output": "fotoshopee\\x64\\Debug\\operations.ixx.obj",
             "outputs": [
-                "C:\\ericp\\fpi\\trab1\\fotoshopee\\x64\\Debug\\vc143.pdb",
+                "C:\\ericp\\fpi\\fotoshopee\\fotoshopee\\x64\\Debug\\vc143.pdb",
                 "fotoshopee\\x64\\Debug\\",
-                "C:\\ericp\\fpi\\trab1\\fotoshopee\\x64\\Debug\\operations.ixx.ifc"
+                "C:\\ericp\\fpi\\fotoshopee\\fotoshopee\\x64\\Debug\\operations.ixx.ifc"
             ],
             "provides": [
                 {
                     "logical-name": "operations",
-                    "source-path": "c:\\ericp\\fpi\\trab1\\operations.ixx",
+                    "source-path": "c:\\ericp\\fpi\\fotoshopee\\operations.ixx",
                     "is-interface": true
                 }
             ],
