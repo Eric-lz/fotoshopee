@@ -19,7 +19,8 @@ public:
 		int width = 600, int heigth = 450);
 
 	// Load new image
-	void loadImage(std::string filename);
+	// Returns 0 if successfull
+	int loadImage(std::string filename);
 
 	// Copy image surface from another window
 	void copyImage(const Window& src);

@@ -37,8 +37,9 @@ void Window::createWindow(std::string name, int pos_x, int pos_y, int width, int
   }
 }
 
-// Load image into original window
-void Window::loadImage(std::string filename)
+// Load image into window
+// Returns 0 if successfull
+int Window::loadImage(std::string filename)
 {
   // Get filename with extension
   filename = getFilename(filename);
@@ -47,9 +48,10 @@ void Window::loadImage(std::string filename)
   surface = IMG_Load(filename.c_str());
   if (surface == nullptr) {
     std::cerr << "Unable to load image " << filename << "! IMG_Error: " << IMG_GetError() << std::endl;
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+		return -1;
   }
+	
+	return 0;
 }
 
 // Copy image surface from another window

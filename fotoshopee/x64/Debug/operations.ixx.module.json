@@ -12,7 +12,7 @@
             "provides": [
                 {
                     "logical-name": "operations",
-                    "source-path": "c:\\ericp\\fpi\\fotoshopee\\operations.ixx",
+                    "source-path": "c:\\ericp\\fpi\\fotoshopee\\src\\operations.ixx",
                     "is-interface": true
                 }
             ],

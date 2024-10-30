@@ -18,15 +18,15 @@
     <ClCompile Include="fotoshopee.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
+    <ClCompile Include="src\operations.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="operations.ixx">
+    <ClCompile Include="src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Window.h">
+    <ClInclude Include="inc\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
