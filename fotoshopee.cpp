@@ -24,6 +24,30 @@ enum Options {
 	EQUALIZE
 };
 
+std::string Operations[] = {
+	"Mirror horizontal",
+	"Mirror vertical",
+	"Grayscale",
+	"Quantize",
+	"Invert",
+	"Brightness",
+	"Contrast",
+	"Equalize"
+};
+
+void printMenu() {
+	std::string line;
+	
+	std::cout << "What operation do you want to perform?\n";
+
+	for (int i = 1;  auto& op : Operations) {
+		line += "(" + std::to_string(i) + ") " + op + "\n";
+		i++;
+	}
+
+	std::cout << line;
+	std::cout << "Select: ";
+}
 
 int main(int argc, char* argv[]) {
 	// Initialize SDL
@@ -69,11 +93,7 @@ int main(int argc, char* argv[]) {
 			Options selection;
 
 			// Prompt user for the operation
-			std::cout << "What operation do you want to perform?\n";
-			std::cout << "(1) Mirror horizontally\n(2) Mirror vertically\n";
-			std::cout << "(3) Grayscale\n(4) Quantize\n";
-			std::cout << "(5) Invert\n(6) Brightness\n(7) Contrast\n";
-			std::cout << "(8) Equalize" << std::endl;
+			printMenu();
 			std::cin >> selectionInput;
 			selection = static_cast<Options>(selectionInput);	// Cast user input into enum
 
@@ -144,7 +164,7 @@ int main(int argc, char* argv[]) {
 		running = true;
 
 		// Prompt user to save the new JPG
-		std::cout << "Enter a name for the new JPG (type N if you don't want to save): ";
+		std::cout << "Enter a name for the new JPG (type N to skip saving): ";
 		std::cin >> outputPath;
 
 		// Skip saving if user types 'N' or 'n'
