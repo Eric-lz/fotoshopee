@@ -13,6 +13,9 @@ import operations;
 // SDL library initialization
 void initSDL();
 
+// Flush cin buffer
+void flush();
+
 // Enum for the operations the user selects
 enum Options {
 	COPY,
@@ -26,6 +29,7 @@ enum Options {
 	QUIT
 };
 
+// Names of available operations
 std::string Operations[] = {
 	"Copy original",
 	"Mirror",
@@ -37,11 +41,13 @@ std::string Operations[] = {
 	"Equalize"
 };
 
+// Print menu of available operations
 void printMenu() {
 	std::string line;
 	
 	std::cout << "What operation do you want to perform?\n";
 
+	// Append all available operations into line
 	for (int i = 0;  auto& op : Operations) {
 		line += "(" + std::to_string(i) + ") " + op + "\n";
 		i++;
@@ -56,9 +62,10 @@ int main(int argc, char* argv[]) {
 	// Initialize SDL
 	initSDL();
 
+	// Flag used to loop the program
 	bool running = true;
 
-	do {
+	while (running) {
 		// Clear screen
 		system("cls");
 
@@ -70,25 +77,24 @@ int main(int argc, char* argv[]) {
 		Window w_original;
 
 		// Load image
-		int ret;
-		do {
+		int ret = -1;
+		while (ret != 0) {
 			// Prompt user for filename
 			std::cout << "Enter the name of a JPG file: ";
 			std::cin >> imagePath;
 			ret = w_original.loadImage(imagePath);
-		} while (ret != 0);
+		}
 
 		// Create and render window
 		w_original.createWindow("Original image", 100, 500, 600, 450);
 		w_original.render();
-
 
 		// Create window for the modified image and copy original image
 		Window w_modified;
 		w_modified.createWindow("Modified image", 700, 500, 600, 450);
 		w_modified.copyImage(w_original);
 
-		do {
+		while (running) {
 			// Clear screen
 			system("cls");
 
@@ -98,9 +104,9 @@ int main(int argc, char* argv[]) {
 
 			// Prompt user for the operation
 			printMenu();
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			// Flush buffer
+			flush();
 			std::cin.get(selection_input);
-
 			if (std::toupper(selection_input) == 'Q') {
 				selection = QUIT;
 			}
@@ -108,12 +114,11 @@ int main(int argc, char* argv[]) {
 				selection = static_cast<Options>(selection_input - '0');	// Cast user input into enum
 			}
 
+			// Get image (surface) from the window
+			auto image = w_modified.getSurface();
 
 			// Store user input for operations that require an argument
 			float value;
-
-			// Get image (surface) from the window
-			auto image = w_modified.getSurface();
 
 			// Select operation to perform
 			switch (selection) {
@@ -145,6 +150,7 @@ int main(int argc, char* argv[]) {
 
 			case INVERT:
 				invert(image);
+				//std::cout << "Invert applied.\n";
 				break;
 
 			case BRIGHTNESS:
@@ -167,7 +173,7 @@ int main(int argc, char* argv[]) {
 				break;
 
 			case QUIT:
-				running = false;
+				running = false;	// reusing running flag to loop operations
 				std::cout << "Quitting.\n";
 				break;
 
@@ -175,24 +181,19 @@ int main(int argc, char* argv[]) {
 				std::cout << "No valid operation selected. Duplicating original image.\n" + std::to_string(selection);
 			}
 
-			// Render new window
+			// Render modified image
 			w_modified.render();
+		}
 
-		} while (running);
-
-		// reusing running flag
+		// reset running flag to loop program
 		running = true;
 
 		// Prompt user to save the new JPG
 		char userSave;
-
 		std::cout << "Do you want to save the new image? (y/N): ";
 		// Flush buffer
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		// Read user input
+		flush();
 		std::cin.get(userSave);
-
 		if (std::toupper(userSave) == 'Y') {
 			std::cout << "Enter a name for the new JPG: ";
 			std::cin >> outputPath;
@@ -206,12 +207,13 @@ int main(int argc, char* argv[]) {
 		// Prompt user to quit or start over
 		char userContinue;
 		std::cout << "Do you want to open a new image? (y/N): ";
+		// Flush buffer
+		flush();
 		std::cin.get(userContinue);
 		if (std::toupper(userContinue) != 'Y') {
 			running = false;
 		}
-
-	} while (running);
+	}
 
 	// Quit SDL
 	IMG_Quit();
@@ -231,4 +233,11 @@ void initSDL() {
 		std::cerr << "SDL_image could not initialize! IMG_Error: " << IMG_GetError() << std::endl;
 		SDL_Quit();
 	}
+}
+
+// Flush std::cin
+void flush() {
+	// Flush buffer
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }

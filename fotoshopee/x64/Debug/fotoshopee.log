@@ -1,5 +1,5 @@
 ﻿  Scanning sources for module dependencies...
   fotoshopee.cpp
-C:\ericp\fpi\fotoshopee\fotoshopee.cpp(142,21): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\ericp\fpi\fotoshopee\fotoshopee.cpp(153,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\fotoshopee.cpp(146,21): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\fotoshopee.cpp(157,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   fotoshopee.vcxproj -> C:\ericp\fpi\fotoshopee\x64\Debug\fotoshopee.exe
