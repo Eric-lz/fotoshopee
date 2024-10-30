@@ -53,22 +53,6 @@ int main(int argc, char* argv[]) {
 		w_original.render();
 
 
-		// What operation the user selected to perform
-		int selectionInput;
-		Options selection;
-
-		// Prompt user for the operation
-		std::cout << "What operation do you want to perform?\n";
-		std::cout << "(1) Mirror horizontally\n(2) Mirror vertically\n";
-		std::cout << "(3) Grayscale\n(4) Quantize\n";
-		std::cout << "(5) Invert\n(6) Brightness\n(7) Contrast\n";
-		std::cout << "(8) Equalize" << std::endl;
-		std::cin >> selectionInput;
-		selection = static_cast<Options>(selectionInput);	// Cast user input into enum
-
-		// Store user input for operations that require an argument
-		float value;
-
 		// Create window for the modified image
 		Window w_modified;
 		w_modified.createWindow("Modified image", 700, 500, 600, 450);
@@ -76,56 +60,88 @@ int main(int argc, char* argv[]) {
 		// Duplicate image from original window
 		w_modified.copyImage(w_original);
 
-		// Get image (surface) from the window
-		auto image = w_modified.getSurface();
+		do {
+			// Clear screen
+			system("cls");
 
-		// Select operation to perform
-		switch (selection) {
-		case MIRRORH:
-			mirrorHorizontal(image);
-			break;
+			// What operation the user selected to perform
+			int selectionInput;
+			Options selection;
 
-		case MIRRORV:
-			mirrorVertical(image);
-			break;
+			// Prompt user for the operation
+			std::cout << "What operation do you want to perform?\n";
+			std::cout << "(1) Mirror horizontally\n(2) Mirror vertically\n";
+			std::cout << "(3) Grayscale\n(4) Quantize\n";
+			std::cout << "(5) Invert\n(6) Brightness\n(7) Contrast\n";
+			std::cout << "(8) Equalize" << std::endl;
+			std::cin >> selectionInput;
+			selection = static_cast<Options>(selectionInput);	// Cast user input into enum
 
-		case GRAYSCALE:
-			grayscale(image);
-			break;
+			// Store user input for operations that require an argument
+			float value;
 
-		case QUANTIZE:
-			std::cout << "How many shades of gray?: ";
-			std::cin >> value;
-			quantize(image, value);
-			break;
+			// Get image (surface) from the window
+			auto image = w_modified.getSurface();
 
-		case INVERT:
-			invert(image);
-			break;
+			// Select operation to perform
+			switch (selection) {
+			case MIRRORH:
+				mirrorHorizontal(image);
+				break;
 
-		case BRIGHTNESS:
-			std::cout << "Brightness [-255, 255]: ";
-			std::cin >> value;
-			brightness(image, value);
-			break;
+			case MIRRORV:
+				mirrorVertical(image);
+				break;
 
-		case CONTRAST:
-			std::cout << "Contrast (0, 255]: ";
-			std::cin >> value;
-			contrast(image, value);
-			break;
+			case GRAYSCALE:
+				grayscale(image);
+				break;
 
-		case EQUALIZE:
-			equalize(image);
-			break;
+			case QUANTIZE:
+				std::cout << "How many shades of gray?: ";
+				std::cin >> value;
+				quantize(image, value);
+				break;
 
-		default:
-			std::cout << "No valid operation selected. Duplicating original image.\n";
-		}
+			case INVERT:
+				invert(image);
+				break;
 
-		// Render new window
-		w_modified.render();
+			case BRIGHTNESS:
+				std::cout << "Brightness [-255, 255]: ";
+				std::cin >> value;
+				brightness(image, value);
+				break;
 
+			case CONTRAST:
+				std::cout << "Contrast (0, 255]: ";
+				std::cin >> value;
+				contrast(image, value);
+				break;
+
+			case EQUALIZE:
+				equalize(image);
+				break;
+
+			default:
+				std::cout << "No valid operation selected. Duplicating original image.\n";
+			}
+
+			// Render new window
+			w_modified.render();
+
+			// Prompt user to perform another operation
+			char userContinue;
+			std::cout << "Do you want to perform another operation? (Y/n): ";
+			std::cin >> userContinue;
+			if (userContinue == 'n' || userContinue == 'N') {
+				running = false;
+			}
+
+		} while (running);
+
+		// reusing running flag
+		running = true;
 
 		// Prompt user to save the new JPG
 		std::cout << "Enter a name for the new JPG (type N if you don't want to save): ";
@@ -142,11 +158,10 @@ int main(int argc, char* argv[]) {
 		}
 
 		// Prompt user to quit or start over
-		std::string userContinue;
+		char userContinue;
 		std::cout << "Do you want to open a new image? (Y/n): ";
 		std::cin >> userContinue;
-
-		if (userContinue.front() == 'n' || userContinue.front() == 'N') {
+		if (userContinue == 'n' || userContinue == 'N') {
 			running = false;
 		}
 
