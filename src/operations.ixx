@@ -176,7 +176,7 @@ export void mirrorHorizontal(SDL_Surface* surface) {
 
 // Operations - part II
 // Calculate histogram of given surface
-int* calculateHistogram(SDL_Surface* surface) {
+static int* calculateHistogram(SDL_Surface* surface) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
@@ -188,7 +188,6 @@ int* calculateHistogram(SDL_Surface* surface) {
 
 	// Histograms
 	int hist[256] = { 0 };
-	int hist_cum[256] = { 0 };	// Cumulative histogram
 
 	// Loop through each pixel to calculate histogram
 	for (int y = 0; y < surface->h; y++) {
@@ -215,7 +214,7 @@ int* calculateHistogram(SDL_Surface* surface) {
 }
 
 // Calculate normalized cumulative histogram of given surface
-int* calculateCumulativeHistogram(SDL_Surface* surface, int* hist = nullptr) {
+static int* calculateCumulativeHistogram(SDL_Surface* surface, int* hist = nullptr) {
 	// Calculate cumulative histogram
 	int hist_cum[256] = { 0 };
 
@@ -428,6 +427,8 @@ export void equalize(SDL_Surface* surface) {
 	}
 }
 
+// TODO
+// Match histogram to target image
 export void matchHistogram(SDL_Surface* surface, SDL_Surface* target) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -467,6 +468,7 @@ export void matchHistogram(SDL_Surface* surface, SDL_Surface* target) {
 			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
 
 			// Calculate new pixel value
+			// TODO
 			/*r = hist_cum[r];
 			g = hist_cum[g];
 			b = hist_cum[b];*/
@@ -548,6 +550,7 @@ export SDL_Surface* rotateCCW(SDL_Surface* surface) {
 	return rotateCW(rotateCW(rotateCW(surface)));
 }
 
+// Actually rotate image 90 degrees counter-clockwise :)
 export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 	// Lock the surface for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
