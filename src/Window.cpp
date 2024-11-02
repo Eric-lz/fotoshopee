@@ -20,6 +20,23 @@ SDL_Surface* Window::getSurface()
 	return surface;
 }
 
+// Get surface from a filename
+// Load the given filename into a surface and returns it
+SDL_Surface* Window::getSurface(std::string filename)
+{
+	// Get filename with extension
+	filename = getFilename(filename);
+
+	// Load image
+	auto surface_target = IMG_Load(filename.c_str());
+	if (surface_target == nullptr) {
+		std::cerr << "Unable to load image " << filename << "! IMG_Error: " << IMG_GetError() << std::endl;
+		return nullptr;
+	}
+
+	return surface_target;
+}
+
 // Create window for original image
 void Window::createWindow(std::string name, int pos_x, int pos_y, int width, int heigth)
 {

@@ -19,16 +19,22 @@ void printMenu();
 // Flush cin buffer
 void flush();
 
+// Get surface from a filename
+// Load the given filename into a surface and returns it
+SDL_Surface* getSurface(std::string filename);
+
 // Enum for the operations the user selects
 enum Options {
 	COPY,
 	MIRROR,
+	ROTATE,
 	GRAYSCALE,
 	QUANTIZE,
 	INVERT,
 	BRIGHTNESS,
 	CONTRAST,
 	EQUALIZE,
+	MATCHHIST,
 	QUIT
 };
 
@@ -36,12 +42,14 @@ enum Options {
 std::string Operations[] = {
 	"Copy original",
 	"Mirror",
+	"Rotate",
 	"Grayscale",
 	"Quantize",
 	"Invert",
 	"Brightness",
 	"Contrast",
-	"Equalize"
+	"Equalize",
+	"Match histogram",
 };
 
 int main(int argc, char* argv[]) {
@@ -103,6 +111,7 @@ int main(int argc, char* argv[]) {
 
 			// Store user input for operations that require an argument
 			float value;
+			SDL_Surface* target_image;	// Target image for histogram matching operation
 
 			// Select operation to perform
 			switch (selection) {
@@ -118,6 +127,14 @@ int main(int argc, char* argv[]) {
 				if (value == 1) mirrorVertical(image);
 				else mirrorHorizontal(image);
 				//std::cout << "Mirror applied.\n";
+				break;
+
+			case ROTATE:
+				std::cout << "(1) Clockwise\n(2) Counter-clockwise\n";
+				std::cout << "Select: ";
+				std::cin >> value;
+				if (value == 1) rotateCW(image);
+				else rotateCCW(image);
 				break;
 
 			case GRAYSCALE:
@@ -154,6 +171,13 @@ int main(int argc, char* argv[]) {
 			case EQUALIZE:
 				equalize(image);
 				//std::cout << "Histogram equalization applied.\n";
+				break;
+
+			case MATCHHIST:
+				std::cout << "Target image name: ";
+				std::cin >> imagePath;
+				target_image = w_modified.getSurface(imagePath);
+				matchHistogram(image, target_image);
 				break;
 
 			case QUIT:

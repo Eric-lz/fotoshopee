@@ -13,6 +13,10 @@ public:
 	// Get surface from this window
 	SDL_Surface* getSurface();
 
+	// Get surface from a filename
+	// Load the given filename into a surface and returns it
+	SDL_Surface* getSurface(std::string filename);
+
 	// Create window
 	void createWindow(std::string name,
 		int pos_x = SDL_WINDOWPOS_UNDEFINED, int pos_y = SDL_WINDOWPOS_UNDEFINED,
