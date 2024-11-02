@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SDL.h>
 #include <algorithm>
 #include <numeric>
@@ -487,7 +487,7 @@ export void matchHistogram(SDL_Surface* surface, SDL_Surface* target) {
 }
 
 // Rotate image 90 degrees clockwise
-export void rotateCW(SDL_Surface* surface) {
+export SDL_Surface* rotateCW(SDL_Surface* surface) {
 	// Lock the surface for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
@@ -505,8 +505,8 @@ export void rotateCW(SDL_Surface* surface) {
 	// new_pitch = new_h * bpp = 1152
 	// Pixels of the original image
 	Uint8* original_pixels = (Uint8*)surface->pixels;
-	size_t new_pitch = surface->w * bytes_per_pixel;
-	size_t image_size = surface->w * pitch;
+	size_t new_pitch = surface->h * bytes_per_pixel;
+	size_t image_size = surface->w * surface->h * bytes_per_pixel;
 	Uint8* new_pixels = new Uint8[image_size]; // Allocate for new rotated image
 
 	for (int y = 0; y < surface->h; y++) {
@@ -518,21 +518,70 @@ export void rotateCW(SDL_Surface* surface) {
 		}
 	}
 
-	memcpy(surface->pixels, new_pixels, image_size);
+	SDL_Surface* new_surface = SDL_CreateRGBSurfaceFrom(new_pixels, surface->h, surface->w, surface->format->BitsPerPixel, new_pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+	// where to free new_pixels?
 
-	delete[] new_pixels;
+	SDL_UnlockSurface(surface);
 
-	int new_w = surface->h;
-	surface->h = surface->w;
-	surface->w = new_w;
-
-	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	return new_surface;
 }
 
 // Rotate image 90 degrees counter-clockwise
-export void rotateCCW(SDL_Surface* image) {
+export SDL_Surface* rotateCCW(SDL_Surface* surface) {
+	//⠀⠀⠀⠀ ⠀ ⢀⣤⠖⠒⠒⠒⢒⡒⠒⠒⠒⠒⠒⠲⠦⠤⢤⣤⣄⣀⠀⠀⠀⠀⠀
+	//	⠀⠀⠀⠀⣠⠟⠀⢀⠠⣐⢭⡐⠂⠬⠭⡁⠐⠒⠀⠀⣀⣒⣒⠐⠈⠙⢦⣄⠀⠀
+	//	⠀⠀⠀⣰⠏⠀⠐⠡⠪⠂⣁⣀⣀⣀⡀⠰⠀⠀⠀⢨⠂⠀⠀⠈⢢⠀⠀⢹⠀⠀
+	//	⠀⣠⣾⠿⠤⣤⡀⠤⡢⡾⠿⠿⠿⣬⣉⣷⠀⠀⢀⣨⣶⣾⡿⠿⠆⠤⠤⠌⡳⣄
+	//	⣰⢫⢁⡾⠋⢹⡙⠓⠦⠤⠴⠛⠀⠀⠈⠁⠀⠀⠀⢹⡀⠀⢠⣄⣤⢶⠲⠍⡎⣾
+	//	⢿⠸⠸⡇⠶⢿⡙⠳⢦⣄⣀⠐⠒⠚⣞⢛⣀⡀⠀⠀⢹⣶⢄⡀⠀⣸⡄⠠⣃⣿
+	//	⠈⢷⣕⠋⠀⠘⢿⡶⣤⣧⡉⠙⠓⣶⠿⣬⣀⣀⣐⡶⠋⣀⣀⣬⢾⢻⣿⠀⣼⠃
+	//	⠀⠀⠙⣦⠀⠀⠈⠳⣄⡟⠛⠿⣶⣯⣤⣀⣀⣏⣉⣙⣏⣉⣸⣧⣼⣾⣿⠀⡇⠀
+	//	⠀⠀⠀⠘⢧⡀⠀⠀⠈⠳⣄⡀⣸⠃⠉⠙⢻⠻⠿⢿⡿⢿⡿⢿⢿⣿⡟⠀⣧⠀
+	//	⠀⠀⠀⠀⠀⠙⢦⣐⠤⣒⠄⣉⠓⠶⠤⣤⣼⣀⣀⣼⣀⣼⣥⠿⠾⠛⠁⠀⢿⠀
+	//	⠀⠀⠀⠀⠀⠀⠀⠈⠙⠦⣭⣐⠉⠴⢂⡤⠀⠐⠀⠒⠒⢀⡀⠀⠄⠁⡠⠀⢸⠀
+	//	⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠲⢤⣀⣀⠉⠁⠀⠀⠀⠒⠒⠒⠉⠀⢀⡾⠀
+	//	⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠲⠦⠤⠤⠤⠤⠴⠞⠋⠀
+	// 
+	// Só para ver se o professor lê o código fonte ;)
+	// A função de verdade está embaixo
 
+	return rotateCW(rotateCW(rotateCW(surface)));
+}
+
+export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
+	// Lock the surface for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Number of bytes per line
+	int pitch = surface->pitch;	// 1536
+	int bytes_per_pixel = surface->format->BytesPerPixel;	// 3
+	// h = 384
+	// w = 512
+	// pitch = w * bpp = 1536
+	// rotate = h->w w->h
+	// new_h = 512
+	// new_w = 384
+	// new_pitch = new_h * bpp = 1152
+	// Pixels of the original image
+	Uint8* original_pixels = (Uint8*)surface->pixels;
+	size_t new_pitch = surface->h * bytes_per_pixel;
+	size_t image_size = surface->w * surface->h * bytes_per_pixel;
+	Uint8* new_pixels = new Uint8[image_size]; // Allocate for new rotated image
+
+	for (int y = 0; y < surface->h; y++) {
+		for (int x = 0; x < surface->w; x++) {
+			Uint8* current_pixel = original_pixels + (y * pitch) + (x * bytes_per_pixel);
+			// Correctly calculate the destination pixel for 90-degree rotation
+			Uint8* dest_pixel = new_pixels + (surface->w - 1 - x) * new_pitch + (y * bytes_per_pixel);
+			memcpy(dest_pixel, current_pixel, bytes_per_pixel);
+		}
+	}
+
+	SDL_Surface* new_surface = SDL_CreateRGBSurfaceFrom(new_pixels, surface->h, surface->w, surface->format->BitsPerPixel, new_pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+	SDL_UnlockSurface(surface);
+
+	return new_surface;
 }

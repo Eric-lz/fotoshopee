@@ -133,8 +133,15 @@ int main(int argc, char* argv[]) {
 				std::cout << "(1) Clockwise\n(2) Counter-clockwise\n";
 				std::cout << "Select: ";
 				std::cin >> value;
-				if (value == 1) rotateCW(image);
-				else rotateCCW(image);
+				// Rotate clockwise
+				if (value == 1) target_image = rotateCW(image);
+				// Rotate counter-clockwise by rotating clockwise 3 times :)
+				else if (value == 2) target_image = rotateCCW(image);
+				// Actually rotate counter-clockwise
+				else target_image = realRotateCCW(image);
+
+				// Set new surface to the rotated image
+				w_modified.setSurface(target_image);
 				break;
 
 			case GRAYSCALE:
@@ -187,6 +194,7 @@ int main(int argc, char* argv[]) {
 
 			default:
 				std::cout << "No valid operation selected. Duplicating original image.\n";
+				break;	
 			}
 
 			// Render modified image

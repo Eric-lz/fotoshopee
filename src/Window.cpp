@@ -20,6 +20,12 @@ SDL_Surface* Window::getSurface()
 	return surface;
 }
 
+void Window::setSurface(SDL_Surface* new_surface)
+{
+	SDL_FreeSurface(surface);
+	surface = new_surface;
+}
+
 // Get surface from a filename
 // Load the given filename into a surface and returns it
 SDL_Surface* Window::getSurface(std::string filename)
