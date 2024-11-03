@@ -92,44 +92,31 @@ export void quantize(SDL_Surface* surface, int levels) {
 
 // Mirrors the given image vertically
 export void mirrorVertical(SDL_Surface* surface) {
-	// Lock the surface_modified for direct pixel manipulation
+	// Lock the surface for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
 	}
 
-	// Marshalling (convert from SDL pixels to 2D array)
-	Image image(surface);
+	// Number of bytes per line
+	int pitch = surface->pitch;
+	int bytes_per_pixel = surface->format->BytesPerPixel;
 
-	Pixel* temp_line = new Pixel[image.w];
+	// Pixels of the original image
+	Uint8* original_pixels = (Uint8*)surface->pixels;
+	size_t image_size = surface->h * pitch;
+	Uint8* new_pixels = new Uint8[image_size];
 
-	// Copy lines from top to bottom
-	for (int y = 0; y < image.h; y++) {
-		int ry = image.h - y - 1;	// Reverse Y
-		Pixel* top_line = image.pixels[y];
-		Pixel* bot_line = image.pixels[ry];
-		Pixel secondpixel_top = top_line[1];
-		Pixel secondpixel_bot = bot_line[1];
-
-		Pixel* first_line = image.pixels[0];
-		Pixel* last_line = image.pixels[image.h - 1];
-
-		// Save first line into temporary variable
-		memcpy(temp_line, top_line, image.w);
-
-		// Copy last line to first
-		memcpy(top_line, bot_line, image.w);
-
-		// Copy temp (first line) into last
-		memcpy(bot_line, temp_line, image.w);
+	for (int y = 0; y < surface->h; y++) {
+		Uint8* current_line = original_pixels + pitch * y;
+		Uint8* dest_line = new_pixels + pitch * (surface->h - 1 - y);
+		memcpy(dest_line, current_line, pitch);
 	}
 
-	// Unmarshalling (revert back to SDL pixels)
-	void* pixels = image.toSurfacePixels();
+	memcpy(surface->pixels, new_pixels, image_size);
 
-	// Copy pixels to surface
-	memcpy(surface->pixels, pixels, image.image_size);
+	delete[] new_pixels;
 
-	// Unlock surface after manipulating pixels
+	// Unlock the surface
 	SDL_UnlockSurface(surface);
 }
 
