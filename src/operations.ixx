@@ -544,11 +544,11 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 // Apply 3x3 convolution filter
 export void convolution(SDL_Surface* surface) {
 	// Hardcoded kernel for testing
-	double kernelL[3][3] = { {0,  -1,  0},
+	double kernel[3][3] = { {0,  -1,  0},
 												   {-1,  4, -1},
 												   {0,  -1,  0} };
 
-	double kernel[3][3] = { {-1, 0, 1},
+	double kernelA[3][3] = { {-1, 0, 1},
 												  {-1, 0, 1},
 												  {-1, 0, 1} };
 
@@ -559,6 +559,7 @@ export void convolution(SDL_Surface* surface) {
 
 	// Marshalling (convert from SDL pixels to 2D array)
 	Image image(surface);
+	Image temp(surface);
 
 	// Loop through each pixel
 	for (int y = 1; y < image.h - 1; y++) {
@@ -570,15 +571,18 @@ export void convolution(SDL_Surface* surface) {
 			for (int ky = -1; ky <= 1; ky++) {
 				for (int kx = -1; kx <= 1; kx++) {
 					// Get the RGBA components
-					Uint8 r = image.pixels[y + ky][x + kx].r;
-					Uint8 g = image.pixels[y + ky][x + kx].g;
-					Uint8 b = image.pixels[y + ky][x + kx].b;
+					int py = y + ky;
+					int px = x + kx;
+					Uint8 r = image.pixels[py][px].r;
+					Uint8 g = image.pixels[py][px].g;
+					Uint8 b = image.pixels[py][px].b;
 
 					// Calculate luminance
 					Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
 					// Multiply by kernel element and accumulate into new_lum
 					new_lum += luminance * kernel[ky + 1][kx + 1];
+					int a = 0;
 				}
 			}
 
@@ -587,14 +591,14 @@ export void convolution(SDL_Surface* surface) {
 			Uint8 luminance = std::clamp(static_cast<int>(new_lum), 0, 255);
 
 			// Set pixels
-			image.pixels[y][x].r = luminance;
-			image.pixels[y][x].g = luminance;
-			image.pixels[y][x].b = luminance;
+			temp.pixels[y][x].r = luminance;
+			temp.pixels[y][x].g = luminance;
+			temp.pixels[y][x].b = luminance;
 		}
 	}
 
 	// Unmarshalling (revert back to SDL pixels)
-	void* pixels = image.toSurfacePixels();
+	void* pixels = temp.toSurfacePixels();
 
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
