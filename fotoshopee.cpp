@@ -30,10 +30,10 @@ enum Options {
 	BRIGHTNESS,
 	CONTRAST,
 	EQUALIZE,
-	MATCHHIST,
+	//MATCHHIST,
 	CONV,
-	TEST,
-	QUIT
+	QUIT,
+	TEST = 42,
 };
 
 // Names of available operations
@@ -47,9 +47,8 @@ std::string Operations[] = {
 	"Brightness",
 	"Contrast",
 	"Equalize",
-	"Match histogram",
-	"Convolution",
-	"test"
+	//"Match histogram",
+	"Convolution"
 };
 
 int main(int argc, char* argv[]) {
@@ -183,24 +182,25 @@ int main(int argc, char* argv[]) {
 				//std::cout << "Histogram equalization applied.\n";
 				break;
 
-			case MATCHHIST:
+			/*case MATCHHIST:
 				std::cout << "Target image name: ";
 				std::cin >> imagePath;
 				target_image = w_modified.getSurface(imagePath);
 				matchHistogram(image, target_image);
-				break;
+				break;*/
 
 			case CONV:
 				convolution(image);
 				break;
 
-			case TEST:
-				test(image);
-				break;
-
 			case QUIT:
 				running = false;	// reusing running flag to loop operations
 				std::cout << "Quitting.\n";
+				break;
+
+			case TEST:
+				std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.\n";
+				test(image);
 				break;
 
 			default:

@@ -23,16 +23,16 @@ export void grayscale(SDL_Surface* surface) {
 	for (int y = 0; y < image.h; y++) {
 		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r = image.pixels[x][y].r;
-			Uint8 g = image.pixels[x][y].g;
-			Uint8 b = image.pixels[x][y].b;
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
 			// Pixel manipulation: grayscale
 			Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
-			image.pixels[x][y].r = luminance;
-			image.pixels[x][y].g = luminance;
-			image.pixels[x][y].b = luminance;
+			image.pixels[y][x].r = luminance;
+			image.pixels[y][x].g = luminance;
+			image.pixels[y][x].b = luminance;
 		}
 	}
 
@@ -53,6 +53,9 @@ export void quantize(SDL_Surface* surface, int levels) {
 		SDL_LockSurface(surface);
 	}
 
+	// ????
+	levels--;
+
 	// Marshalling (convert from SDL pixels to 2D array)
 	Image image(surface);
 
@@ -60,9 +63,9 @@ export void quantize(SDL_Surface* surface, int levels) {
 	for (int y = 0; y < image.h; y++) {
 		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r = image.pixels[x][y].r;
-			Uint8 g = image.pixels[x][y].g;
-			Uint8 b = image.pixels[x][y].b;
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
 			// Pixel manipulation: grayscale
 			Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
@@ -71,9 +74,9 @@ export void quantize(SDL_Surface* surface, int levels) {
 			Uint8 new_quant_value = round(luminance / quant_sizes);
 			Uint8 new_luminance = new_quant_value * quant_sizes;
 
-			image.pixels[x][y].r = new_luminance;
-			image.pixels[x][y].g = new_luminance;
-			image.pixels[x][y].b = new_luminance;
+			image.pixels[y][x].r = new_luminance;
+			image.pixels[y][x].g = new_luminance;
+			image.pixels[y][x].b = new_luminance;
 		}
 	}
 
@@ -89,31 +92,44 @@ export void quantize(SDL_Surface* surface, int levels) {
 
 // Mirrors the given image vertically
 export void mirrorVertical(SDL_Surface* surface) {
-	// Lock the surface for direct pixel manipulation
+	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Pixels of the original image
-	Uint8* original_pixels = (Uint8*)surface->pixels;
-	size_t image_size = surface->h * pitch;
-	Uint8* new_pixels = new Uint8[image_size];
+	Pixel* temp_line = new Pixel[image.w];
 
-	for (int y = 0; y < surface->h; y++) {
-		Uint8* current_line = original_pixels + pitch * y;
-		Uint8* dest_line = new_pixels + pitch * (surface->h - 1 - y);
-		memcpy(dest_line, current_line, pitch);
+	// Copy lines from top to bottom
+	for (int y = 0; y < image.h; y++) {
+		int ry = image.h - y - 1;	// Reverse Y
+		Pixel* top_line = image.pixels[y];
+		Pixel* bot_line = image.pixels[ry];
+		Pixel secondpixel_top = top_line[1];
+		Pixel secondpixel_bot = bot_line[1];
+
+		Pixel* first_line = image.pixels[0];
+		Pixel* last_line = image.pixels[image.h - 1];
+
+		// Save first line into temporary variable
+		memcpy(temp_line, top_line, image.w);
+
+		// Copy last line to first
+		memcpy(top_line, bot_line, image.w);
+
+		// Copy temp (first line) into last
+		memcpy(bot_line, temp_line, image.w);
 	}
 
-	memcpy(surface->pixels, new_pixels, image_size);
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
 
-	delete[] new_pixels;
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
 
-	// Unlock the surface
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -160,28 +176,22 @@ static int* calculateHistogram(SDL_Surface* surface) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
-
-	// Histograms
+	// Histogram
 	int hist[256] = { 0 };
 
-	// Loop through each pixel to calculate histogram
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
 			// Calculate luminance
-			int luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+			Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
 			// Increment histogram
 			hist[luminance]++;
@@ -220,38 +230,31 @@ export void invert(SDL_Surface* surface) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Loop through each pixel
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
-
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
 			// Pixel manipulation: invert
-			r = 255 - r;
-			g = 255 - g;
-			b = 255 - b;
-
-			// Set the modified pixel back
-			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
-
-			pixel[2] = new_pixel_value >> 16;
-			pixel[1] = new_pixel_value >> 8;
-			pixel[0] = new_pixel_value;
+			image.pixels[y][x].r = 255 - r;
+			image.pixels[y][x].g = 255 - g;
+			image.pixels[y][x].b = 255 - b;
 		}
 	}
 
-	// Unlock the surface
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -262,22 +265,16 @@ export void brightness(SDL_Surface* surface, int value) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Loop through each pixel
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
-
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
 			// Pixel manipulation: adjust brightness
 			// Store values in a bigger int
@@ -290,16 +287,20 @@ export void brightness(SDL_Surface* surface, int value) {
 			g = std::clamp(new_g, 0, 255);
 			b = std::clamp(new_b, 0, 255);
 
-			// Set the modified pixel back
-			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
-
-			pixel[2] = new_pixel_value >> 16;
-			pixel[1] = new_pixel_value >> 8;
-			pixel[0] = new_pixel_value;
+			// Set pixels back into the image
+			image.pixels[y][x].r = r;
+			image.pixels[y][x].g = g;
+			image.pixels[y][x].b = b;
 		}
 	}
 
-	// Unlock the surface
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -310,22 +311,16 @@ export void contrast(SDL_Surface* surface, float value) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Loop through each pixel
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
-
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
 			// Pixel manipulation: adjust contrast
 			// Store values in a bigger int
@@ -338,16 +333,20 @@ export void contrast(SDL_Surface* surface, float value) {
 			g = std::clamp(new_g, 0, 255);
 			b = std::clamp(new_b, 0, 255);
 
-			// Set the modified pixel back
-			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
-
-			pixel[2] = new_pixel_value >> 16;
-			pixel[1] = new_pixel_value >> 8;
-			pixel[0] = new_pixel_value;
+			// Set pixels back into the image
+			image.pixels[y][x].r = r;
+			image.pixels[y][x].g = g;
+			image.pixels[y][x].b = b;
 		}
 	}
 
-	// Unlock the surface
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -357,43 +356,42 @@ export void equalize(SDL_Surface* surface) {
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
 	}
-	
+
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
+
 	// Histogram and cumulative histogram
 	int* hist = calculateHistogram(surface);
 	int* hist_cum = calculateCumulativeHistogram(surface);
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
-
-	// Loop through each pixel
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
-
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			Uint8 r = image.pixels[y][x].r;
+			Uint8 g = image.pixels[y][x].g;
+			Uint8 b = image.pixels[y][x].b;
 
+			// Pixel manipulation: histogram equalization
 			// Calculate new pixel value
 			r = hist_cum[r];
 			g = hist_cum[g];
 			b = hist_cum[b];
 
-			// Set the modified pixel back
-			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
-
-			pixel[2] = new_pixel_value >> 16;
-			pixel[1] = new_pixel_value >> 8;
-			pixel[0] = new_pixel_value;
+			// Set pixels back into the image
+			image.pixels[y][x].r = r;
+			image.pixels[y][x].g = g;
+			image.pixels[y][x].b = b;
 		}
 	}
 
-	// Unlock the surface
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -632,8 +630,9 @@ export void test(SDL_Surface* surface) {
 	// Manipulate pixels
 	for (int y = 0; y < image.h; y++) {
 		for (int x = 0; x < image.w; x++) {
-			image.pixels[x][y].r = 0;
-			image.pixels[x][y].g = 0;
+			image.pixels[y][x].r = x;
+			image.pixels[y][x].g = 0;
+			image.pixels[y][x].b = y;
 		}
 	}
 

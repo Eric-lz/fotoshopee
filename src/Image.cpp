@@ -13,9 +13,9 @@ Image::Image(SDL_Surface* surface)
 	
 
 	// Allocate memory for the image
-	pixels = new Pixel*[w];
-	for (int i = 0; i < w; ++i) {
-		pixels[i] = new Pixel[h];
+	pixels = new Pixel*[h];
+	for (int y = 0; y < h; ++y) {
+		pixels[y] = new Pixel[w];
 	}
 
 	// Loop through each pixel
@@ -30,10 +30,9 @@ Image::Image(SDL_Surface* surface)
 			// Get the RGBA components
 			Uint8 r, g, b;
 			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
-			// 11639629
 
 			// Save pixel RGB values into array
-			pixels[x][y] = { r, g, b };
+			pixels[y][x] = { r, g, b };
 		}
 	}
 }
@@ -41,8 +40,8 @@ Image::Image(SDL_Surface* surface)
 // Free memory
 Image::~Image()
 {
-	for (int i = 0; i < w; ++i) {
-		delete[] pixels[i];
+	for (int y = 0; y < h; ++y) {
+		delete[] pixels[y];
 	}
 	delete[] pixels;
 }
@@ -56,9 +55,9 @@ void* Image::toSurfacePixels() {
 		for (int x = 0; x < w; x++) {
 			Uint8* pixel = surface_pixels + (y * pitch) + (x * bytes_per_pixel);
 
-			int r = pixels[x][y].r;
-			int g = pixels[x][y].g;
-			int b = pixels[x][y].b;
+			int r = pixels[y][x].r;
+			int g = pixels[y][x].g;
+			int b = pixels[y][x].b;
 
 			// Set the modified pixel back
 			Uint32 pixel_value = SDL_MapRGB(format, r, g, b);
