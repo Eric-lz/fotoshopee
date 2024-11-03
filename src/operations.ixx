@@ -42,6 +42,9 @@ export void grayscale(SDL_Surface* surface) {
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
 
+	// Pixels is no longer needed
+	delete[] pixels;
+
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
@@ -86,6 +89,9 @@ export void quantize(SDL_Surface* surface, int levels) {
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
 
+	// Pixels is no longer needed
+	delete[] pixels;
+
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
@@ -112,6 +118,9 @@ export void mirrorVertical(SDL_Surface* surface) {
 
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Pixels is no longer needed
+	delete[] pixels;
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
@@ -309,6 +318,9 @@ export void invert(SDL_Surface* surface) {
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
 
+	// Pixels is no longer needed
+	delete[] pixels;
+
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
@@ -354,6 +366,9 @@ export void brightness(SDL_Surface* surface, int value) {
 
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Pixels is no longer needed
+	delete[] pixels;
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
@@ -401,6 +416,9 @@ export void contrast(SDL_Surface* surface, float value) {
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
 
+	// Pixels is no longer needed
+	delete[] pixels;
+
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
@@ -445,6 +463,9 @@ export void equalize(SDL_Surface* surface) {
 
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Pixels is no longer needed
+	delete[] pixels;
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
@@ -678,6 +699,9 @@ export void convolution(SDL_Surface* surface) {
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
 
+	// Pixels is no longer needed
+	delete[] pixels;
+
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
@@ -732,6 +756,9 @@ export void gaussBlur(SDL_Surface* surface) {
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
 
+	// Pixels is no longer needed
+	delete[] pixels;
+
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
@@ -759,6 +786,9 @@ export void test(SDL_Surface* surface) {
 	
 	// Copy pixels to surface
 	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Pixels is no longer needed
+	delete[] pixels;
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
