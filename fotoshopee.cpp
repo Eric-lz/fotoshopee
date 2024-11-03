@@ -32,6 +32,7 @@ enum Options {
 	EQUALIZE,
 	MATCHHIST,
 	CONV,
+	TEST,
 	QUIT
 };
 
@@ -47,7 +48,8 @@ std::string Operations[] = {
 	"Contrast",
 	"Equalize",
 	"Match histogram",
-	"Convolution"
+	"Convolution",
+	"test"
 };
 
 int main(int argc, char* argv[]) {
@@ -91,17 +93,17 @@ int main(int argc, char* argv[]) {
 			system("cls");
 
 			// What operation the user selected to perform
-			char selection_input;
+			std::string selection_input;
 			Options selection;
 
 			// Prompt user for the operation
 			printMenu();
-			std::cin.get(selection_input);
-			if (std::toupper(selection_input) == 'Q') {
+			std::cin >> selection_input;
+			if (selection_input == "Q" || selection_input == "q") {
 				selection = QUIT;
 			}
 			else {
-				selection = static_cast<Options>(selection_input - '0');	// Cast user input into enum
+				selection = static_cast<Options>(std::atoi(selection_input.c_str()));	// Cast user input into enum
 			}
 
 			// Get image (surface) from the window
@@ -187,6 +189,11 @@ int main(int argc, char* argv[]) {
 
 			case CONV:
 				convolution(image);
+				break;
+
+			case TEST:
+				target_image = test(image);
+				w_modified.setSurface(target_image);
 				break;
 
 			case QUIT:

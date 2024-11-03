@@ -2,6 +2,9 @@
 #include <SDL.h>
 #include <algorithm>
 #include <numeric>
+#include "Image.h"
+
+#include <iostream>
 
 export module operations;
 
@@ -503,7 +506,6 @@ export SDL_Surface* rotateCW(SDL_Surface* surface) {
 	}
 
 	SDL_Surface* new_surface = SDL_CreateRGBSurfaceFrom(new_pixels, surface->h, surface->w, surface->format->BitsPerPixel, new_pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
-	// where to free new_pixels?
 
 	SDL_UnlockSurface(surface);
 
@@ -574,9 +576,15 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 // Apply 3x3 convolution filter
 export void convolution(SDL_Surface* surface) {
 	// Hardcoded kernel for testing
-	double kernel[][3] = { {0, -1, 0},
-													{-1, 4, -1},
-													{0, -1, 0} };
+	double kernel[][3] = { {0,  -1,  0},
+												 {-1,  4, -1},
+												 {0,  -1,  0} };
+
+	// Apply grayscale filter (EXCEPT FOR LOW-PASS)
+	bool is_low_pass = true;
+	if (!is_low_pass) {
+		grayscale(surface);
+	}
 
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -587,34 +595,73 @@ export void convolution(SDL_Surface* surface) {
 	int pitch = surface->pitch;
 	int bytes_per_pixel = surface->format->BytesPerPixel;
 
-	// Loop through each pixel
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
+	// Loop through each pixel (except borders)
+	for (int y = 1; y < surface->h - 1; y++) {
+		for (int x = 1; x < surface->w - 1; x++) {
 
-			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			// New values for R, G and B
+			Uint8 new_r = 0;
+			Uint8 new_g = 0;
+			Uint8 new_b = 0;
 
-			// Pixel manipulation
-			r = r;
-			g = g;
-			b = b;
+			// Loop through kernel
+			for (int ky = -1; ky < 1; ky++) {
+				for (int kx = -1; kx < 1; kx++) {
+					// This image has 3 bytes per pixel
+					// Get to the first byte of the pixel and get the value from the next two bytes
+					// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
+					Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
+					Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
 
-			// Set the modified pixel back
-			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
+					// Get the RGBA components of the current pixel
+					Uint8 r, g, b;
+					SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
 
-			// Revert pixel mask
-			pixel[2] = new_pixel_value >> 16;
-			pixel[1] = new_pixel_value >> 8;
-			pixel[0] = new_pixel_value;
+					// Apply convolution
+					//Uint8* current_pixel = pixel + () + ();
+
+					// Set the modified pixel back
+					Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
+
+					// Revert pixel mask
+					pixel[2] = new_pixel_value >> 16;
+					pixel[1] = new_pixel_value >> 8;
+					pixel[0] = new_pixel_value;
+				}
+			}	// Kernel loop
+
 		}
-	}
+	}	// Image loop
 
 	// Unlock the surface
 	SDL_UnlockSurface(surface);
+}
+
+export SDL_Surface* test(SDL_Surface* surface) {
+	// Lock the surface_modified for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Marshalling
+	Image image(surface);
+
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
+			image.pixels[x][y].r = 0;
+			image.pixels[x][y].g = 0;
+		}
+	}
+
+	// Unmarshalling
+	void* pixels = image.toSurfacePixels();
+
+	// Create new surface and assign
+	auto new_surface = SDL_CreateRGBSurfaceFrom(pixels, image.w, image.h, surface->format->BitsPerPixel, image.pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+	// Unlock surface after manipulating pixels
+	SDL_UnlockSurface(surface);
+
+	return new_surface;
 }
