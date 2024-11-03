@@ -14,7 +14,7 @@ public:
 	SDL_Surface* getSurface();
 
 	// Set surface for this window
-	 void setSurface(SDL_Surface* new_surface);
+	void setSurface(SDL_Surface* new_surface);
 
 	// Get surface from a filename
 	// Load the given filename into a surface and returns it

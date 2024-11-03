@@ -46,9 +46,7 @@ export void grayscale(SDL_Surface* surface) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Quantizes the given image into "levels" of gray
@@ -100,9 +98,7 @@ export void quantize(SDL_Surface* surface, int levels) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Mirrors the given image vertically
@@ -132,9 +128,7 @@ export void mirrorVertical(SDL_Surface* surface) {
 	delete[] new_pixels;
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Mirrors the given image horizontally
@@ -168,9 +162,7 @@ export void mirrorHorizontal(SDL_Surface* surface) {
 	delete[] new_pixels;
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 
@@ -274,9 +266,7 @@ export void invert(SDL_Surface* surface) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Adjust brightness by the given value
@@ -324,9 +314,7 @@ export void brightness(SDL_Surface* surface, int value) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Adjust contrast by the given value
@@ -374,9 +362,7 @@ export void contrast(SDL_Surface* surface, float value) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Equalize histogram
@@ -422,9 +408,7 @@ export void equalize(SDL_Surface* surface) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // TODO
@@ -483,9 +467,7 @@ export void matchHistogram(SDL_Surface* surface, SDL_Surface* target) {
 	}
 
 	// Unlock the surface
-	if (SDL_MUSTLOCK(surface)) {
-		SDL_UnlockSurface(surface);
-	}
+	SDL_UnlockSurface(surface);
 }
 
 // Rotate image 90 degrees clockwise
@@ -587,4 +569,52 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 	SDL_UnlockSurface(surface);
 
 	return new_surface;
+}
+
+// Apply 3x3 convolution filter
+export void convolution(SDL_Surface* surface) {
+	// Hardcoded kernel for testing
+	double kernel[][3] = { {0, -1, 0},
+													{-1, 4, -1},
+													{0, -1, 0} };
+
+	// Lock the surface_modified for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Number of bytes per line
+	int pitch = surface->pitch;
+	int bytes_per_pixel = surface->format->BytesPerPixel;
+
+	// Loop through each pixel
+	for (int y = 0; y < surface->h; y++) {
+		for (int x = 0; x < surface->w; x++) {
+			// This image has 3 bytes per pixel
+			// Get to the first byte of the pixel and get the value from the next two bytes
+			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
+			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
+			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
+
+			// Get the RGBA components
+			Uint8 r, g, b;
+			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+
+			// Pixel manipulation
+			r = r;
+			g = g;
+			b = b;
+
+			// Set the modified pixel back
+			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
+
+			// Revert pixel mask
+			pixel[2] = new_pixel_value >> 16;
+			pixel[1] = new_pixel_value >> 8;
+			pixel[0] = new_pixel_value;
+		}
+	}
+
+	// Unlock the surface
+	SDL_UnlockSurface(surface);
 }

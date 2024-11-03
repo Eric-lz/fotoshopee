@@ -19,10 +19,6 @@ void printMenu();
 // Flush cin buffer
 void flush();
 
-// Get surface from a filename
-// Load the given filename into a surface and returns it
-SDL_Surface* getSurface(std::string filename);
-
 // Enum for the operations the user selects
 enum Options {
 	COPY,
@@ -35,6 +31,7 @@ enum Options {
 	CONTRAST,
 	EQUALIZE,
 	MATCHHIST,
+	CONV,
 	QUIT
 };
 
@@ -50,6 +47,7 @@ std::string Operations[] = {
 	"Contrast",
 	"Equalize",
 	"Match histogram",
+	"Convolution"
 };
 
 int main(int argc, char* argv[]) {
@@ -185,6 +183,10 @@ int main(int argc, char* argv[]) {
 				std::cin >> imagePath;
 				target_image = w_modified.getSurface(imagePath);
 				matchHistogram(image, target_image);
+				break;
+
+			case CONV:
+				convolution(image);
 				break;
 
 			case QUIT:
