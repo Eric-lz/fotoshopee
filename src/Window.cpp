@@ -96,6 +96,17 @@ void Window::render()
 		std::cerr << "Unable to create texture from surface! SDL_Error: " << SDL_GetError() << std::endl;
 	}
 
+  // Resize window to image size
+  SDL_SetWindowSize(window, surface->w, surface->h);
+
+  // Get display resolution
+  SDL_DisplayMode* display_mode = nullptr;
+  SDL_GetWindowDisplayMode(window, display_mode);
+  int resolution_w = display_mode->w;
+  int resolution_h = display_mode->h;
+  // Set window position based on resolution
+  SDL_SetWindowPosition(window, resolution_w, resolution_h);
+
   // Clear the window
   SDL_RenderClear(renderer);
 
