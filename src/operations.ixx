@@ -544,64 +544,116 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 // Apply 3x3 convolution filter
 export void convolution(SDL_Surface* surface) {
 	// Hardcoded kernel for testing
-	double kernel[][3] = { {0,  -1,  0},
-												 {-1,  4, -1},
-												 {0,  -1,  0} };
+	double kernelL[3][3] = { {0,  -1,  0},
+												   {-1,  4, -1},
+												   {0,  -1,  0} };
 
-	// Apply grayscale filter (EXCEPT FOR LOW-PASS)
-	bool is_low_pass = true;
-	if (!is_low_pass) {
-		grayscale(surface);
-	}
+	double kernel[3][3] = { {-1, 0, 1},
+												  {-1, 0, 1},
+												  {-1, 0, 1} };
 
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Loop through each pixel (except borders)
-	for (int y = 1; y < surface->h - 1; y++) {
-		for (int x = 1; x < surface->w - 1; x++) {
-
-			// New values for R, G and B
-			Uint8 new_r = 0;
-			Uint8 new_g = 0;
-			Uint8 new_b = 0;
+	// Loop through each pixel
+	for (int y = 1; y < image.h - 1; y++) {
+		for (int x = 1; x < image.w - 1; x++) {
+			// New value for luminance
+			double new_lum = 0;
 
 			// Loop through kernel
-			for (int ky = -1; ky < 1; ky++) {
-				for (int kx = -1; kx < 1; kx++) {
-					// This image has 3 bytes per pixel
-					// Get to the first byte of the pixel and get the value from the next two bytes
-					// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-					Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-					Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
+			for (int ky = -1; ky <= 1; ky++) {
+				for (int kx = -1; kx <= 1; kx++) {
+					// Get the RGBA components
+					Uint8 r = image.pixels[y + ky][x + kx].r;
+					Uint8 g = image.pixels[y + ky][x + kx].g;
+					Uint8 b = image.pixels[y + ky][x + kx].b;
 
-					// Get the RGBA components of the current pixel
-					Uint8 r, g, b;
-					SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+					// Calculate luminance
+					Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
-					// Apply convolution
-					//Uint8* current_pixel = pixel + () + ();
-
-					// Set the modified pixel back
-					Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
-
-					// Revert pixel mask
-					pixel[2] = new_pixel_value >> 16;
-					pixel[1] = new_pixel_value >> 8;
-					pixel[0] = new_pixel_value;
+					// Multiply by kernel element and accumulate into new_lum
+					new_lum += luminance * kernel[ky + 1][kx + 1];
 				}
-			}	// Kernel loop
+			}
 
+			// Clamp values between (0, 255] to store in Uint8
+			new_lum += 127;
+			Uint8 luminance = std::clamp(static_cast<int>(new_lum), 0, 255);
+
+			// Set pixels
+			image.pixels[y][x].r = luminance;
+			image.pixels[y][x].g = luminance;
+			image.pixels[y][x].b = luminance;
 		}
-	}	// Image loop
+	}
 
-	// Unlock the surface
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
+	SDL_UnlockSurface(surface);
+}
+
+// Apply 3x3 gaussian convolution filter
+export void gaussBlur(SDL_Surface* surface) {
+	// Hardcoded kernel for testing
+	double kernel[3][3] = { {0.0625,  0.125,  0.0625},
+												 {0.125,   0.25,   0.125},
+												 {0.0625,  0.125,  0.0625} };
+
+	// Lock the surface_modified for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
+
+	// Loop through each pixel
+	for (int y = 1; y < image.h - 1; y++) {
+		for (int x = 1; x < image.w - 1; x++) {
+			// New values for RGB
+			double new_r = 0;
+			double new_g = 0;
+			double new_b = 0;
+
+			// Loop through kernel
+			for (int ky = -1; ky <= 1; ky++) {
+				for (int kx = -1; kx <= 1; kx++) {
+					new_r += image.pixels[y + ky][x + kx].r * kernel[ky + 1][kx + 1];
+					new_g += image.pixels[y + ky][x + kx].g * kernel[ky + 1][kx + 1];
+					new_b += image.pixels[y + ky][x + kx].b * kernel[ky + 1][kx + 1];
+				}
+			}
+			
+			// Clamp values between (0, 255] to store in Uint8
+			Uint8 r = std::clamp(static_cast<int>(new_r), 0, 255);
+			Uint8 g = std::clamp(static_cast<int>(new_g), 0, 255);
+			Uint8 b = std::clamp(static_cast<int>(new_b), 0, 255);
+
+			// Set pixels
+			image.pixels[y][x].r = r;
+			image.pixels[y][x].g = g;
+			image.pixels[y][x].b = b;
+		}
+	}
+
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 

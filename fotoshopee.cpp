@@ -31,6 +31,7 @@ enum Options {
 	CONTRAST,
 	EQUALIZE,
 	//MATCHHIST,
+	GAUSS,
 	CONV,
 	QUIT,
 	TEST = 42,
@@ -48,6 +49,7 @@ std::string Operations[] = {
 	"Contrast",
 	"Equalize",
 	//"Match histogram",
+	"Gaussian blur",
 	"Convolution"
 };
 
@@ -188,6 +190,10 @@ int main(int argc, char* argv[]) {
 				target_image = w_modified.getSurface(imagePath);
 				matchHistogram(image, target_image);
 				break;*/
+
+			case GAUSS:
+				gaussBlur(image);
+				break;
 
 			case CONV:
 				convolution(image);
