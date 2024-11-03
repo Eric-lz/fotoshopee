@@ -634,20 +634,7 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 // TODO: Get kernel from user
 // Maybe have a few preset kernels to choose from
 // and a "Custom kernel" option
-export void convolution(SDL_Surface* surface) {
-	// Hardcoded kernel for testing
-	double kernelA[3][3] = { {0,  -1,  0},
-												   {-1,  4, -1},
-												   {0,  -1,  0} };
-
-	double kernelB[3][3] = { {-1, 0, 1},
-													 {-1, 0, 1},
-													 {-1, 0, 1} };
-
-	double kernel[3][3] = { {-1, -1, -1},
-													{-1,  8, -1},
-													{-1, -1, -1} };
-
+export void convolution(SDL_Surface* surface, double** kernel, int type) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
@@ -683,7 +670,9 @@ export void convolution(SDL_Surface* surface) {
 			}
 
 			// Clamp values between (0, 255] to store in Uint8
-			//new_lum += 127;
+			if (type > 3) {
+				new_lum += 127;
+			}
 			Uint8 luminance = std::clamp(static_cast<int>(new_lum), 0, 255);
 
 			// Set pixels

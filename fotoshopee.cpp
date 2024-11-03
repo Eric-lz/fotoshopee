@@ -6,6 +6,7 @@
 #include <cmath>
 #include <string>
 #include "Window.h"
+#include "Kernel.h"
 
 // Import operations module
 import operations;
@@ -31,7 +32,6 @@ enum Options {
 	CONTRAST,
 	EQUALIZE,
 	//MATCHHIST,
-	GAUSS,
 	CONV,
 	TEST = 42,
 	QUIT
@@ -49,7 +49,6 @@ std::string Operations[] = {
 	"Contrast",
 	"Equalize",
 	//"Match histogram",
-	"Gaussian blur",
 	"Convolution"
 };
 
@@ -119,6 +118,7 @@ int main(int argc, char* argv[]) {
 
 			// Store user input for operations that require an argument
 			float value;
+			double** kernel = nullptr;
 			SDL_Surface* target_image = nullptr;	// Target image for histogram matching operation
 
 			// Select operation to perform
@@ -195,15 +195,19 @@ int main(int argc, char* argv[]) {
 				matchHistogram(image, target_image);
 				break;*/
 
-			case GAUSS:
-				gaussBlur(image);
-				break;
-
 			case CONV:
-				// TODO: Get kernel from user
-				// Maybe have a few preset kernels to choose from
-				// and a "Custom kernel" option
-				convolution(image);
+				system("cls");
+				std::cout << "What kernel do you want to use?\n";
+				Kernels::printKernels();
+				std::cout << "Select: ";
+				std::cin >> value;
+				if (value == 1) {
+					gaussBlur(image);
+				}
+				else {
+					kernel = Kernels::getKernel(value);
+					convolution(image, kernel, value);
+				}
 				break;
 
 			case QUIT:

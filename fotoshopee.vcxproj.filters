@@ -27,12 +27,18 @@
     <ClCompile Include="src\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kernel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Kernel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
