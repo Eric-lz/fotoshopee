@@ -1,3 +1,24 @@
 ﻿  Scanning sources for module dependencies...
-  Image.cpp
+  operations.ixx
+  Compiling...
+  operations.ixx
+C:\ericp\fpi\fotoshopee\src\operations.ixx(9,25): warning C5201: a module declaration can appear only at the start of a translation unit unless a global module fragment is used
+C:\ericp\fpi\fotoshopee\src\operations.ixx(31,20): warning C4244: 'initializing': conversion from 'double' to 'Uint8', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(68,20): warning C4244: 'initializing': conversion from 'double' to 'Uint8', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(70,22): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(71,26): warning C4244: 'initializing': conversion from 'float' to 'Uint8', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(72,24): warning C4244: 'initializing': conversion from 'float' to 'Uint8', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(184,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(208,24): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(210,33): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(332,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(333,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(334,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(491,121): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(552,121): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\src\operations.ixx(213,1): warning C4172: returning address of local variable or temporary : hist_cum
+C:\ericp\fpi\fotoshopee\src\operations.ixx(191,1): warning C4172: returning address of local variable or temporary : hist
+  fotoshopee.cpp
+C:\ericp\fpi\fotoshopee\fotoshopee.cpp(158,21): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\ericp\fpi\fotoshopee\fotoshopee.cpp(170,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   fotoshopee.vcxproj -> C:\ericp\fpi\fotoshopee\x64\Debug\fotoshopee.exe
