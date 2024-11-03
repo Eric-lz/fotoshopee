@@ -544,13 +544,17 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 // Apply 3x3 convolution filter
 export void convolution(SDL_Surface* surface) {
 	// Hardcoded kernel for testing
-	double kernel[3][3] = { {0,  -1,  0},
+	double kernelA[3][3] = { {0,  -1,  0},
 												   {-1,  4, -1},
 												   {0,  -1,  0} };
 
-	double kernelA[3][3] = { {-1, 0, 1},
-												  {-1, 0, 1},
-												  {-1, 0, 1} };
+	double kernelB[3][3] = { {-1, 0, 1},
+													 {-1, 0, 1},
+													 {-1, 0, 1} };
+
+	double kernel[3][3] = { {-1, -1, -1},
+													{-1,  8, -1},
+													{-1, -1, -1} };
 
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -587,7 +591,7 @@ export void convolution(SDL_Surface* surface) {
 			}
 
 			// Clamp values between (0, 255] to store in Uint8
-			new_lum += 127;
+			//new_lum += 127;
 			Uint8 luminance = std::clamp(static_cast<int>(new_lum), 0, 255);
 
 			// Set pixels
@@ -611,8 +615,8 @@ export void convolution(SDL_Surface* surface) {
 export void gaussBlur(SDL_Surface* surface) {
 	// Hardcoded kernel for testing
 	double kernel[3][3] = { {0.0625,  0.125,  0.0625},
-												 {0.125,   0.25,   0.125},
-												 {0.0625,  0.125,  0.0625} };
+												  {0.125,   0.25,   0.125},
+												  {0.0625,  0.125,  0.0625} };
 
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
