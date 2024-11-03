@@ -195,8 +195,7 @@ int main(int argc, char* argv[]) {
 				break;
 
 			case TEST:
-				new_image = test(image);
-				w_modified.setSurface(new_image);
+				test(image);
 				break;
 
 			case QUIT:

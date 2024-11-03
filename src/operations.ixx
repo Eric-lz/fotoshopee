@@ -16,39 +16,33 @@ export void grayscale(SDL_Surface* surface) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Loop through each pixel
-	for (int y = 0; y < surface->h; y++) {
-		for (int x = 0; x < surface->w; x++) {
-			// This image has 3 bytes per pixel
-			// Get to the first byte of the pixel and get the value from the next two bytes
-			// TODO: Improve this! The whole operation will be easy if there was a Uint24 type
-			Uint8* pixel = (Uint8*)surface->pixels + y * pitch + x * bytes_per_pixel;
-			Uint32 pixel_value = pixel[0] | pixel[1] << 8 | pixel[2] << 16;
-
+	// Manipulate pixels
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r, g, b;
-			SDL_GetRGB(pixel_value, surface->format, &r, &g, &b);
+			Uint8 r = image.pixels[x][y].r;
+			Uint8 g = image.pixels[x][y].g;
+			Uint8 b = image.pixels[x][y].b;
 
 			// Pixel manipulation: grayscale
-			int luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
-			r = luminance;
-			g = luminance;
-			b = luminance;
+			Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
-			// Set the modified pixel back
-			Uint32 new_pixel_value = SDL_MapRGB(surface->format, r, g, b);
-
-			pixel[2] = new_pixel_value >> 16;
-			pixel[1] = new_pixel_value >> 8;
-			pixel[0] = new_pixel_value;
+			image.pixels[x][y].r = luminance;
+			image.pixels[x][y].g = luminance;
+			image.pixels[x][y].b = luminance;
 		}
 	}
 
-	// Unlock the surface
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
+
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -637,13 +631,13 @@ export void convolution(SDL_Surface* surface) {
 	SDL_UnlockSurface(surface);
 }
 
-export SDL_Surface* test(SDL_Surface* surface) {
+export void test(SDL_Surface* surface) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
 	}
 
-	// Marshalling
+	// Marshalling (convert from SDL pixels to 2D array)
 	Image image(surface);
 
 	// Manipulate pixels
@@ -654,14 +648,12 @@ export SDL_Surface* test(SDL_Surface* surface) {
 		}
 	}
 
-	// Unmarshalling
+	// Unmarshalling (revert back to SDL pixels)
 	void* pixels = image.toSurfacePixels();
-
-	// Create new surface and assign
-	auto new_surface = SDL_CreateRGBSurfaceFrom(pixels, image.w, image.h, surface->format->BitsPerPixel, image.pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+	
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
-
-	return new_surface;
 }

@@ -41,10 +41,10 @@ Image::Image(SDL_Surface* surface)
 // Free memory
 Image::~Image()
 {
-	/*for (int i = 0; i < h; ++i) {
+	for (int i = 0; i < h; ++i) {
 		delete[] pixels[i];
 	}
-	delete[] pixels;*/
+	delete[] pixels;
 }
 
 // Unmarshalling
