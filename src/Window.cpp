@@ -52,6 +52,13 @@ void Window::createWindow(std::string name, int pos_x, int pos_y, int width, int
     std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
   }
 
+	// Get display mode and set resolution
+	if(SDL_GetCurrentDisplayMode(0, &display_mode) != 0)
+		std::cerr << "Error getting display mode! SDL_Error: " << SDL_GetError() << std::endl;
+
+	resolution_h = display_mode.h;
+	resolution_w = display_mode.w;
+
   // Create renderer
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   if (renderer == nullptr) {
@@ -99,13 +106,12 @@ void Window::render()
   // Resize window to image size
   SDL_SetWindowSize(window, surface->w, surface->h);
 
-  // Get display resolution
-  SDL_DisplayMode* display_mode = nullptr;
-  SDL_GetWindowDisplayMode(window, display_mode);
-  int resolution_w = display_mode->w;
-  int resolution_h = display_mode->h;
-  // Set window position based on resolution
-  SDL_SetWindowPosition(window, resolution_w, resolution_h);
+	// Get window position
+	// Using X to keep the window in the same position
+	SDL_GetWindowPosition(window, &pos_x, &pos_y);
+
+  // Set window position based on resolution (100 pixels above bottom edge of screen)
+  SDL_SetWindowPosition(window, pos_x, resolution_h - surface->h - 100);
 
   // Clear the window
   SDL_RenderClear(renderer);

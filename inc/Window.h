@@ -43,6 +43,10 @@ private:
 	SDL_Renderer* renderer = nullptr;
 	SDL_Surface* surface = nullptr;
 	SDL_Texture* texture = nullptr;
+	SDL_DisplayMode display_mode;
+	int resolution_w;
+	int resolution_h;
+	int pos_x, pos_y;
 
 	// Check if filename has .jpg extension
 	// Returns filename with extension
