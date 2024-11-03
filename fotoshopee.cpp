@@ -87,6 +87,7 @@ int main(int argc, char* argv[]) {
 		Window w_modified;
 		w_modified.createWindow("Modified image", 700, 500, 600, 450);
 		w_modified.copyImage(w_original);
+		w_modified.render();
 
 		// Create window for the histogram
 		Window w_histogram;
@@ -95,6 +96,11 @@ int main(int argc, char* argv[]) {
 		while (running) {
 			// Clear screen
 			system("cls");
+
+			// Create histogram surface and render
+			auto s_histogram = SDL_DuplicateSurface(drawHistogram(w_modified.getSurface()));
+			w_histogram.setSurface(s_histogram);
+			w_histogram.render();
 
 			// What operation the user selected to perform
 			std::string selection_input;
@@ -227,13 +233,6 @@ int main(int argc, char* argv[]) {
 
 			// Render modified image
 			w_modified.render();
-			
-			// Create histogram surface
-			auto s_histogram = SDL_DuplicateSurface(drawHistogram(w_modified.getSurface()));
-
-			// Set histogram window surface
-			w_histogram.setSurface(s_histogram);
-			w_histogram.render();
 		}
 
 		// reset running flag to loop program
