@@ -35,6 +35,6 @@
 *.jpg
 
 .vs/
-.x64/
-.Debug/
-.fotoshopee/
+x64/
+Debug/
+fotoshopee/
