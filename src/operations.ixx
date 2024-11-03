@@ -92,31 +92,28 @@ export void quantize(SDL_Surface* surface, int levels) {
 
 // Mirrors the given image vertically
 export void mirrorVertical(SDL_Surface* surface) {
-	// Lock the surface for direct pixel manipulation
+	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
 		SDL_LockSurface(surface);
 	}
 
-	// Number of bytes per line
-	int pitch = surface->pitch;
-	int bytes_per_pixel = surface->format->BytesPerPixel;
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
 
-	// Pixels of the original image
-	Uint8* original_pixels = (Uint8*)surface->pixels;
-	size_t image_size = surface->h * pitch;
-	Uint8* new_pixels = new Uint8[image_size];
-
-	for (int y = 0; y < surface->h; y++) {
-		Uint8* current_line = original_pixels + pitch * y;
-		Uint8* dest_line = new_pixels + pitch * (surface->h - 1 - y);
-		memcpy(dest_line, current_line, pitch);
+	// Manipulate pixels
+	for (int y = 0; y < image.h / 2; y++) {
+		auto temp = image.pixels[y];
+		image.pixels[y] = image.pixels[image.h - y - 1];
+		image.pixels[image.h - y - 1] = temp;
 	}
 
-	memcpy(surface->pixels, new_pixels, image_size);
+	// Unmarshalling (revert back to SDL pixels)
+	void* pixels = image.toSurfacePixels();
 
-	delete[] new_pixels;
+	// Copy pixels to surface
+	memcpy(surface->pixels, pixels, image.image_size);
 
-	// Unlock the surface
+	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
 }
 
@@ -542,6 +539,9 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 }
 
 // Apply 3x3 convolution filter
+// TODO: Get kernel from user
+// Maybe have a few preset kernels to choose from
+// and a "Custom kernel" option
 export void convolution(SDL_Surface* surface) {
 	// Hardcoded kernel for testing
 	double kernelA[3][3] = { {0,  -1,  0},

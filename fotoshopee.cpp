@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
 
 			// Store user input for operations that require an argument
 			float value;
-			SDL_Surface* target_image;	// Target image for histogram matching operation
+			SDL_Surface* target_image = nullptr;	// Target image for histogram matching operation
 
 			// Select operation to perform
 			switch (selection) {
@@ -196,6 +196,9 @@ int main(int argc, char* argv[]) {
 				break;
 
 			case CONV:
+				// TODO: Get kernel from user
+				// Maybe have a few preset kernels to choose from
+				// and a "Custom kernel" option
 				convolution(image);
 				break;
 
