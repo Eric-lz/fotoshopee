@@ -22,4 +22,4 @@ C:\ericp\fpi\fotoshopee\src\operations.ixx(185,1): warning C4172: returning addr
   fotoshopee.cpp
 C:\ericp\fpi\fotoshopee\fotoshopee.cpp(159,21): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 C:\ericp\fpi\fotoshopee\fotoshopee.cpp(171,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  fotoshopee.vcxproj -> C:\ericp\fpi\fotoshopee\x64\Debug\fotoshopee.exe
+LINK : fatal error LNK1168: cannot open C:\ericp\fpi\fotoshopee\x64\Debug\fotoshopee.exe for writing
