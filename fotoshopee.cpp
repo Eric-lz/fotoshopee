@@ -33,8 +33,8 @@ enum Options {
 	//MATCHHIST,
 	GAUSS,
 	CONV,
-	QUIT,
 	TEST = 42,
+	QUIT
 };
 
 // Names of available operations
@@ -88,6 +88,10 @@ int main(int argc, char* argv[]) {
 		Window w_modified;
 		w_modified.createWindow("Modified image", 700, 500, 600, 450);
 		w_modified.copyImage(w_original);
+
+		// Create window for the histogram
+		Window w_histogram;
+		w_histogram.createWindow("Histogram", 1300, 100, 256, 256);
 
 		while (running) {
 			// Clear screen
@@ -219,6 +223,13 @@ int main(int argc, char* argv[]) {
 
 			// Render modified image
 			w_modified.render();
+			
+			// Create histogram surface
+			auto s_histogram = SDL_DuplicateSurface(drawHistogram(w_modified.getSurface()));
+
+			// Set histogram window surface
+			w_histogram.setSurface(s_histogram);
+			w_histogram.render();
 		}
 
 		// reset running flag to loop program
