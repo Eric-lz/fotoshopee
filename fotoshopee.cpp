@@ -109,6 +109,9 @@ int main(int argc, char* argv[]) {
 			// Get image (surface) from the window
 			auto image = w_modified.getSurface();
 
+			// New image
+			SDL_Surface* new_image = nullptr;
+
 			// Store user input for operations that require an argument
 			float value;
 			SDL_Surface* target_image;	// Target image for histogram matching operation
@@ -134,14 +137,14 @@ int main(int argc, char* argv[]) {
 				std::cout << "Select: ";
 				std::cin >> value;
 				// Rotate clockwise
-				if (value == 1) target_image = rotateCW(image);
+				if (value == 1) new_image = rotateCW(image);
 				// Rotate counter-clockwise by rotating clockwise 3 times :)
-				else if (value == 2) target_image = rotateCCW(image);
+				else if (value == 2) new_image = rotateCCW(image);
 				// Actually rotate counter-clockwise
-				else target_image = realRotateCCW(image);
+				else new_image = realRotateCCW(image);
 
 				// Set new surface to the rotated image
-				w_modified.setSurface(target_image);
+				w_modified.setSurface(new_image);
 				break;
 
 			case GRAYSCALE:
@@ -192,8 +195,8 @@ int main(int argc, char* argv[]) {
 				break;
 
 			case TEST:
-				target_image = test(image);
-				w_modified.setSurface(target_image);
+				new_image = test(image);
+				w_modified.setSurface(new_image);
 				break;
 
 			case QUIT:
