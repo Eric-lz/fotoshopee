@@ -195,16 +195,18 @@ int* calculateHistogram(SDL_Surface* surface) {
 }
 
 // Calculate normalized cumulative histogram of given surface
-static int* calculateCumulativeHistogram(SDL_Surface* surface, int* hist = nullptr) {
+double* calculateCumulativeHistogram(SDL_Surface* surface, int* hist = nullptr) {
 	// Calculate cumulative histogram
-	int hist_cum[256] = { 0 };
+	double* hist_cum = new double[256] { 0 };
 
+	// If no histogram was given, calculate
 	if (hist == nullptr) {
 		hist = calculateHistogram(surface);
 	}
 
 	// Number of pixels in the image
 	int num_pixels = surface->h * surface->w;
+
 	// Scaling factor
 	double scaling = 255.0 / num_pixels;
 
@@ -258,7 +260,7 @@ export SDL_Surface* drawHistogram(SDL_Surface* surface) {
 
 	// Draw histogram
 	for (int i = 0; i < 256; i++) {
-		// Percent of values in that bin
+		// Percent of values in that bin (scaled to max)
 		double values = hist[i] / (pixel_max);
 
 		// Top of the current column
@@ -280,6 +282,7 @@ export SDL_Surface* drawHistogram(SDL_Surface* surface) {
 
 	// Pixels is no longer needed
 	delete[] pixels;
+	delete[] hist;
 
 	SDL_UnlockSurface(surface);
 	SDL_UnlockSurface(hist_surface);
@@ -435,7 +438,7 @@ export void equalize(SDL_Surface* surface) {
 
 	// Histogram and cumulative histogram
 	int* hist = calculateHistogram(surface);
-	int* hist_cum = calculateCumulativeHistogram(surface);
+	double* hist_cum = calculateCumulativeHistogram(surface, hist);
 
 	// Manipulate pixels
 	for (int y = 0; y < image.h; y++) {
@@ -445,16 +448,13 @@ export void equalize(SDL_Surface* surface) {
 			Uint8 g = image.pixels[y][x].g;
 			Uint8 b = image.pixels[y][x].b;
 
-			// Pixel manipulation: histogram equalization
-			// Calculate new pixel value
-			r = hist_cum[r];
-			g = hist_cum[g];
-			b = hist_cum[b];
+			// Calculate grayscale
+			Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
 			// Set pixels back into the image
-			image.pixels[y][x].r = r;
-			image.pixels[y][x].g = g;
-			image.pixels[y][x].b = b;
+			image.pixels[y][x].r = hist_cum[luminance];
+			image.pixels[y][x].g = hist_cum[luminance];
+			image.pixels[y][x].b = hist_cum[luminance];
 		}
 	}
 
@@ -466,6 +466,10 @@ export void equalize(SDL_Surface* surface) {
 
 	// Pixels is no longer needed
 	delete[] pixels;
+
+	// Histograms no longer needed
+	delete[] hist;
+	delete[] hist_cum;
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
