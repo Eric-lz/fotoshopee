@@ -129,6 +129,7 @@ int main(int argc, char* argv[]) {
 			while (SDL_PollEvent(&event)) {
 				SDL_Delay(100);
 				w_modified.render();
+				w_histogram.render();
 			}
 			t1.join();
 
