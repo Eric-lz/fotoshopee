@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <thread>
 #include "Window.h"
 #include "Kernel.h"
 
@@ -55,6 +56,11 @@ std::string Operations[] = {
 	"Scale down",
 	"Scale up"
 };
+
+std::string user_input;
+void userInputThread() {
+	std::cin >> user_input;
+}
 
 int main(int argc, char* argv[]) {
 	// Initialize SDL
@@ -107,17 +113,23 @@ int main(int argc, char* argv[]) {
 			w_histogram.render();
 
 			// What operation the user selected to perform
-			std::string selection_input;
+			//std::string selection_input;
 			Options selection;
 
 			// Prompt user for the operation
 			printMenu();
-			std::cin >> selection_input;
-			if (selection_input == "Q" || selection_input == "q") {
+			std::thread t1(userInputThread);
+			SDL_Event event;
+			while (SDL_PollEvent(&event)) {
+			}
+			w_histogram.render();
+			t1.join();
+
+			if (user_input == "Q" || user_input == "q") {
 				selection = QUIT;
 			}
 			else {
-				selection = static_cast<Options>(std::atoi(selection_input.c_str()));	// Cast user input into enum
+				selection = static_cast<Options>(std::atoi(user_input.c_str()));	// Cast user input into enum
 			}
 
 			// Get image (surface) from the window
