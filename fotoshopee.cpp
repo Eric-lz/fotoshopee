@@ -118,13 +118,16 @@ int main(int argc, char* argv[]) {
 
 			// Prompt user for the operation
 			printMenu();
+
+			// Very bad workaround to stop SDL window from freezing and not updating
+			// while the program waits for user input.
+			// User input is captured in another thread
 			std::thread t1(userInputThread);
 			SDL_Event event;
 			while (SDL_PollEvent(&event)) {
 				SDL_Delay(100);
 				w_modified.render();
 			}
-			w_histogram.render();
 			t1.join();
 
 			if (user_input == "Q" || user_input == "q") {

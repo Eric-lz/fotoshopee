@@ -227,6 +227,13 @@ static int hist_max(int* hist) {
 	return max;
 }
 
+// Get luminance for a given pixel
+Uint8 getLuminance(Pixel pixel) {
+	// Calculate luminance
+	Uint8 luminance = (0.299 * pixel.r) + (0.587 * pixel.g) + (0.114 * pixel.b);
+	return luminance;
+}
+
 // Draw histogram in the given surface
 export SDL_Surface* drawHistogram(SDL_Surface* surface) {
 	// Calculate input image histogram
@@ -475,13 +482,6 @@ export void equalize(SDL_Surface* surface) {
 	SDL_UnlockSurface(surface);
 }
 
-// Get luminance for a given pixel
-Uint8 getLuminance(Pixel pixel) {
-	// Calculate luminance
-	Uint8 luminance = (0.299 * pixel.r) + (0.587 * pixel.g) + (0.114 * pixel.b);
-	return luminance;
-}
-
 // Match histogram to target image
 export void matchHistogram(SDL_Surface* surface, SDL_Surface* target_surface) {
 	// Lock the surface_modified for direct pixel manipulation
@@ -631,10 +631,7 @@ export SDL_Surface* realRotateCCW(SDL_Surface* surface) {
 	return new_surface;
 }
 
-// Apply 3x3 convolution filter
-// TODO: Get kernel from user
-// Maybe have a few preset kernels to choose from
-// and a "Custom kernel" option
+// Apply 3x3 convolution filter using the given kernel
 export void convolution(SDL_Surface* surface, double** kernel, int type) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -654,15 +651,13 @@ export void convolution(SDL_Surface* surface, double** kernel, int type) {
 			// Loop through kernel
 			for (int ky = -1; ky <= 1; ky++) {
 				for (int kx = -1; kx <= 1; kx++) {
-					// Get the RGBA components
+					// Get pixel
 					int py = y + ky;
 					int px = x + kx;
-					Uint8 r = image.pixels[py][px].r;
-					Uint8 g = image.pixels[py][px].g;
-					Uint8 b = image.pixels[py][px].b;
+					Pixel pixel = image.pixels[py][px];
 
 					// Calculate luminance
-					Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+					Uint8 luminance = getLuminance(pixel);
 
 					// Multiply by kernel element and accumulate into new_lum
 					new_lum += luminance * kernel[ky + 1][kx + 1];
@@ -670,10 +665,12 @@ export void convolution(SDL_Surface* surface, double** kernel, int type) {
 				}
 			}
 
-			// Clamp values between (0, 255] to store in Uint8
+			// In specific cases, add 127 to the luminance
 			if (type > 3) {
 				new_lum += 127;
 			}
+
+			// Clamp values between (0, 255] to store in Uint8
 			Uint8 luminance = std::clamp(static_cast<int>(new_lum), 0, 255);
 
 			// Set pixels
@@ -698,10 +695,12 @@ export void convolution(SDL_Surface* surface, double** kernel, int type) {
 
 // Apply 3x3 gaussian convolution filter
 export void gaussBlur(SDL_Surface* surface) {
-	// Hardcoded kernel for testing
-	double kernel[3][3] = { {0.0625,  0.125,  0.0625},
-												  {0.125,   0.25,   0.125},
-												  {0.0625,  0.125,  0.0625} };
+	// Hardcoded gaussian kernel
+	double kernel[3][3] = {
+		{0.0625,  0.125,  0.0625},
+		{0.125,   0.25,   0.125},
+		{0.0625,  0.125,  0.0625}
+	};
 
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -753,6 +752,7 @@ export void gaussBlur(SDL_Surface* surface) {
 	SDL_UnlockSurface(surface);
 }
 
+// Scale image down by a factor of Sx and Sy
 export SDL_Surface* scaleDown(SDL_Surface* surface, const int Sx, const int Sy) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -831,6 +831,7 @@ export SDL_Surface* scaleDown(SDL_Surface* surface, const int Sx, const int Sy) 
 	return new_surface;
 }
 
+// Scale image up by a factor of 2
 export SDL_Surface* scaleUp(SDL_Surface* surface) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
@@ -912,6 +913,7 @@ export SDL_Surface* scaleUp(SDL_Surface* surface) {
 	return new_surface;
 }
 
+// Test
 export void test(SDL_Surface* surface) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {

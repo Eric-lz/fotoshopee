@@ -4,6 +4,8 @@
 using std::cout;
 using std::cin;
 
+// Kernel namespace
+// Contains a few preset kernels and useful functions
 namespace Kernels {
 	// Print kernel options
 	void printKernels()
