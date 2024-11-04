@@ -835,6 +835,87 @@ export SDL_Surface* scaleDown(SDL_Surface* surface, const int Sx, const int Sy) 
 	return new_surface;
 }
 
+export SDL_Surface* scaleUp(SDL_Surface* surface) {
+	// Lock the surface_modified for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Result image parameters
+	// Sizes are doubled in each dimension
+	int new_w = surface->w * 2;
+	int new_h = surface->h * 2;
+	int new_image_size = new_w * new_h * surface->format->BytesPerPixel;
+	int new_pitch = new_w * surface->format->BytesPerPixel;
+
+	// Allocate pixels
+	void* new_pixels = new Uint8[new_image_size]{ 0 };
+
+	// Create new surface with resized dimensions
+	SDL_Surface* new_surface = SDL_CreateRGBSurfaceFrom(new_pixels, new_w, new_h, surface->format->BitsPerPixel, new_pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
+	Image output(new_surface);
+
+	// Insert blank row/col between each pixel
+	for (int y = 0; y < image.h; y++) {
+		for (int x = 0; x < image.w; x++) {
+			output.pixels[y*2][x*2] = image.pixels[y][x];
+		}
+	}
+
+	// Interpolate columns
+	for (int y = 0; y < output.h - 2; y += 2) {
+		// Loop through every even pixel
+		for (int x = 1; x < output.w - 1; x += 2) {
+			// Average previous and next pixel to get current pixel
+			Uint8 avg_r = (output.pixels[y][x - 1].r + output.pixels[y][x + 1].r) / 2;
+			Uint8 avg_g = (output.pixels[y][x - 1].g + output.pixels[y][x + 1].g) / 2;
+			Uint8 avg_b = (output.pixels[y][x - 1].b + output.pixels[y][x + 1].b) / 2;
+
+			Pixel pixelAB;
+			pixelAB.r = avg_r;
+			pixelAB.g = avg_g;
+			pixelAB.b = avg_b;
+
+			output.pixels[y][x] = pixelAB;
+		}
+	}
+
+	// Interpolate rows
+	for (int y = 1; y < output.h - 1; y += 2) {
+		for (int x = 0; x < output.w - 1; x++) {
+			// Average previous and next pixel to get current pixel
+			Uint8 avg_r = (output.pixels[y-1][x].r + output.pixels[y+1][x].r) / 2;
+			Uint8 avg_g = (output.pixels[y-1][x].g + output.pixels[y+1][x].g) / 2;
+			Uint8 avg_b = (output.pixels[y-1][x].b + output.pixels[y+1][x].b) / 2;
+
+			Pixel pixelAB;
+			pixelAB.r = avg_r;
+			pixelAB.g = avg_g;
+			pixelAB.b = avg_b;
+
+			output.pixels[y][x] = pixelAB;
+		}
+	}
+
+	// Unmarshalling (revert back to SDL pixels)
+	new_pixels = output.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(new_surface->pixels, new_pixels, new_image_size);
+
+	// Pixels is no longer needed
+	delete[] new_pixels;
+
+	// Unlock surface after manipulating pixels
+	SDL_UnlockSurface(surface);
+	SDL_UnlockSurface(new_surface);
+
+	return new_surface;
+}
+
 export void test(SDL_Surface* surface) {
 	// Lock the surface_modified for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {

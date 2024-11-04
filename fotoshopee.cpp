@@ -237,12 +237,13 @@ int main(int argc, char* argv[]) {
 				std::cin >> value >> value2;
 				//new_image = SDL_DuplicateSurface(scaleDown(image, value, value2));
 
-				// Set new surface to the rotated image
-				w_modified.setSurface(SDL_DuplicateSurface(scaleDown(image, value, value2)));
+				// Set new surface to the scaled down image
+				w_modified.setSurface(scaleDown(image, value, value2));
 				break;
 
 			case SCALEUP:
-
+				// Set new surface to the scaled up image
+				w_modified.setSurface(scaleUp(image));
 				break;
 
 			case QUIT:
