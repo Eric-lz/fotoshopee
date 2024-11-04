@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 			system("cls");
 
 			// Create histogram surface and render
-			auto s_histogram = SDL_DuplicateSurface(drawHistogram(w_modified.getSurface()));
+			auto s_histogram = drawHistogram(w_modified.getSurface());
 			w_histogram.setSurface(s_histogram);
 			w_histogram.render();
 

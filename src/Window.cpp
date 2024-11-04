@@ -22,8 +22,8 @@ SDL_Surface* Window::getSurface()
 
 void Window::setSurface(SDL_Surface* new_surface)
 {
-	SDL_FreeSurface(surface);
-	surface = new_surface;
+	surface = SDL_DuplicateSurface(new_surface);
+	SDL_FreeSurface(new_surface);
 }
 
 // Get surface from a filename
@@ -47,7 +47,7 @@ SDL_Surface* Window::getSurface(std::string filename)
 void Window::createWindow(std::string name, int pos_x, int pos_y, int width, int heigth)
 {
 	window = SDL_CreateWindow(name.c_str(),
-		pos_x, pos_y, width, heigth, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+		pos_x, pos_y, width, heigth, SDL_WINDOW_SHOWN);
   if (window == nullptr) {
     std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
   }
