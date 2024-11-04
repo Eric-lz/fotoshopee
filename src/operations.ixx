@@ -451,12 +451,10 @@ export void equalize(SDL_Surface* surface) {
 	for (int y = 0; y < image.h; y++) {
 		for (int x = 0; x < image.w; x++) {
 			// Get the RGBA components
-			Uint8 r = image.pixels[y][x].r;
-			Uint8 g = image.pixels[y][x].g;
-			Uint8 b = image.pixels[y][x].b;
+			Pixel pixel = image.pixels[y][x];
 
 			// Calculate grayscale
-			Uint8 luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+			Uint8 luminance = getLuminance(pixel);
 
 			// Set pixels back into the image
 			image.pixels[y][x].r = hist_cum[luminance];
@@ -530,7 +528,7 @@ export void matchHistogram(SDL_Surface* surface, SDL_Surface* target_surface) {
 	SDL_UnlockSurface(surface);
 }
 
-// Rotate image 90 degrees clockwise
+// Rotate image 90 degrees clockwise (not using Image class)
 export SDL_Surface* rotateCW(SDL_Surface* surface) {
 	// Lock the surface for direct pixel manipulation
 	if (SDL_MUSTLOCK(surface)) {
