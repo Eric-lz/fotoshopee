@@ -92,18 +92,19 @@ int main(int argc, char* argv[]) {
 		}
 
 		// Create and render window
-		w_original.createWindow("Original image", 100, 500, 600, 450);
+		w_original.createWindow("Original image", 0, 500);
 		w_original.render();
 
 		// Create window for the modified image and copy original image
 		Window w_modified;
-		w_modified.createWindow("Modified image", 700, 500, 600, 450);
+		int window_x = w_original.getSurface()->w;	// Open modified right next to original
+		w_modified.createWindow("Modified image", window_x, 500);
 		w_modified.copyImage(w_original);
 		w_modified.render();
 
 		// Create window for the histogram
 		Window w_histogram;
-		w_histogram.createWindow("Histogram", 1300, 100, 256, 256);
+		w_histogram.createWindow("Histogram", window_x*2, 500, 256, 256);
 
 		while (running) {
 			// Clear screen
