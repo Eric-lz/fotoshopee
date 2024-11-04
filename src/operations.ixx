@@ -569,6 +569,7 @@ export SDL_Surface* rotateCW(SDL_Surface* surface) {
 	SDL_Surface* new_surface = SDL_CreateRGBSurfaceFrom(new_pixels, surface->h, surface->w, surface->format->BitsPerPixel, new_pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
 
 	SDL_UnlockSurface(surface);
+	SDL_UnlockSurface(new_surface);
 
 	return new_surface;
 }
@@ -754,6 +755,84 @@ export void gaussBlur(SDL_Surface* surface) {
 
 	// Unlock surface after manipulating pixels
 	SDL_UnlockSurface(surface);
+}
+
+export SDL_Surface* scaleDown(SDL_Surface* surface, const int Sx, const int Sy) {
+	// Lock the surface_modified for direct pixel manipulation
+	if (SDL_MUSTLOCK(surface)) {
+		SDL_LockSurface(surface);
+	}
+
+	// Result image parameters
+	int new_w = surface->w / Sx;
+	int new_h = surface->h / Sy;
+	int new_image_size = new_w * new_h * surface->format->BytesPerPixel;
+	int new_pitch = new_w * surface->format->BytesPerPixel;
+
+	// Allocate pixels
+	void* new_pixels = new Uint8[new_image_size]{ 0 };
+
+	// Create new surface with resized dimensions
+	SDL_Surface * new_surface = SDL_CreateRGBSurfaceFrom(new_pixels, new_w, new_h, surface->format->BitsPerPixel, new_pitch, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+	// Marshalling (convert from SDL pixels to 2D array)
+	Image image(surface);
+	Image output(new_surface);
+
+	int new_y = 0;
+
+	// Iterate over image in blocks of Sx and Sy
+	for (int y = 0; y < image.h - Sy; y += Sy) {
+		int new_x = 0;
+
+		for (int x = 0; x < image.w - Sx; x += Sx) {
+			// Calculate new pixel
+			double new_r = 0;
+			double new_g = 0;
+			double new_b = 0;
+			int valid_pixels;
+
+			// Iterate through the pixels inside the block
+			for (int by = y; by < y + Sy; by++) {
+				for (int bx = x; bx < x + Sx; bx++) {
+					valid_pixels = Sy * Sx;
+					if (by >= image.h) {
+						valid_pixels--;
+					}
+					else {
+						new_r += image.pixels[by][bx].r;
+						new_g += image.pixels[by][bx].g;
+						new_b += image.pixels[by][bx].b;
+					}
+				}
+			}
+
+			new_r /= valid_pixels;
+			new_g /= valid_pixels;
+			new_b /= valid_pixels;
+
+			output.pixels[new_y][new_x].r = new_r;
+			output.pixels[new_y][new_x].g = new_g;
+			output.pixels[new_y][new_x].b = new_b;
+			new_x++;
+		}
+		new_y++;
+	}
+
+	// Unmarshalling (revert back to SDL pixels)
+	new_pixels = output.toSurfacePixels();
+
+	// Copy pixels to surface
+	memcpy(new_surface->pixels, new_pixels, new_image_size);
+
+	// Pixels is no longer needed
+	delete[] new_pixels;
+
+	// Unlock surface after manipulating pixels
+	SDL_UnlockSurface(surface);
+	SDL_UnlockSurface(new_surface);
+
+	return new_surface;
 }
 
 export void test(SDL_Surface* surface) {

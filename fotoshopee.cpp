@@ -33,6 +33,8 @@ enum Options {
 	EQUALIZE,
 	//MATCHHIST,
 	CONV,
+	SCALEDOWN,
+	SCALEUP,
 	TEST = 42,
 	QUIT
 };
@@ -49,7 +51,9 @@ std::string Operations[] = {
 	"Contrast",
 	"Equalize",
 	//"Match histogram",
-	"Convolution"
+	"Convolution",
+	"Scale down",
+	"Scale up"
 };
 
 int main(int argc, char* argv[]) {
@@ -123,7 +127,7 @@ int main(int argc, char* argv[]) {
 			SDL_Surface* new_image = nullptr;
 
 			// Store user input for operations that require an argument
-			float value;
+			float value, value2;
 			double** kernel = nullptr;
 			SDL_Surface* target_image = nullptr;	// Target image for histogram matching operation
 
@@ -216,6 +220,19 @@ int main(int argc, char* argv[]) {
 				}
 				break;
 
+			case SCALEDOWN:
+				std::cout << "Type in the scale factor Sx and Sy: ";
+				std::cin >> value >> value2;
+				//new_image = SDL_DuplicateSurface(scaleDown(image, value, value2));
+
+				// Set new surface to the rotated image
+				w_modified.setSurface(SDL_DuplicateSurface(scaleDown(image, value, value2)));
+				break;
+
+			case SCALEUP:
+
+				break;
+
 			case QUIT:
 				running = false;	// reusing running flag to loop operations
 				std::cout << "Quitting.\n";
@@ -230,6 +247,10 @@ int main(int argc, char* argv[]) {
 				std::cout << "No valid operation selected. Duplicating original image.\n";
 				break;	
 			}
+
+			/*if (new_image != nullptr) {
+				w_modified.setSurface(SDL_DuplicateSurface(new_image));
+			}*/
 
 			// Render modified image
 			w_modified.render();
