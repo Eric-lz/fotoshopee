@@ -32,7 +32,7 @@ enum Options {
 	BRIGHTNESS,
 	CONTRAST,
 	EQUALIZE,
-	//MATCHHIST,
+	MATCHHIST,
 	CONV,
 	SCALEDOWN,
 	SCALEUP,
@@ -51,7 +51,7 @@ std::string Operations[] = {
 	"Brightness",
 	"Contrast",
 	"Equalize",
-	//"Match histogram",
+	"Match histogram",
 	"Convolution",
 	"Scale down",
 	"Scale up"
@@ -121,6 +121,8 @@ int main(int argc, char* argv[]) {
 			std::thread t1(userInputThread);
 			SDL_Event event;
 			while (SDL_PollEvent(&event)) {
+				SDL_Delay(100);
+				w_modified.render();
 			}
 			w_histogram.render();
 			t1.join();
@@ -203,12 +205,12 @@ int main(int argc, char* argv[]) {
 				equalize(image);
 				break;
 
-			/*case MATCHHIST:
+			case MATCHHIST:
 				std::cout << "Target image name: ";
 				std::cin >> imagePath;
 				target_image = w_modified.getSurface(imagePath);
 				matchHistogram(image, target_image);
-				break;*/
+				break;
 
 			case CONV:
 				system("cls");
