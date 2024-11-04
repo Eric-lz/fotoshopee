@@ -156,7 +156,6 @@ int main(int argc, char* argv[]) {
 				std::cin >> value;
 				if (value == 1) mirrorVertical(image);
 				else mirrorHorizontal(image);
-				//std::cout << "Mirror applied.\n";
 				break;
 
 			case ROTATE:
@@ -176,38 +175,32 @@ int main(int argc, char* argv[]) {
 
 			case GRAYSCALE:
 				grayscale(image);
-				//std::cout << "Grayscale applied.\n";
 				break;
 
 			case QUANTIZE:
 				std::cout << "How many shades of gray?: ";
 				std::cin >> value;
 				quantize(image, value);
-				//std::cout << "Quantization applied.\n";
 				break;
 
 			case INVERT:
 				invert(image);
-				//std::cout << "Invert applied.\n";
 				break;
 
 			case BRIGHTNESS:
 				std::cout << "Brightness [-255, 255]: ";
 				std::cin >> value;
 				brightness(image, value);
-				//std::cout << "Brightness adjustment applied.\n";
 				break;
 
 			case CONTRAST:
 				std::cout << "Contrast (0, 255]: ";
 				std::cin >> value;
 				contrast(image, value);
-				//std::cout << "Contrast adjustment applied.\n";
 				break;
 
 			case EQUALIZE:
 				equalize(image);
-				//std::cout << "Histogram equalization applied.\n";
 				break;
 
 			/*case MATCHHIST:
@@ -235,7 +228,6 @@ int main(int argc, char* argv[]) {
 			case SCALEDOWN:
 				std::cout << "Type in the scale factor Sx and Sy: ";
 				std::cin >> value >> value2;
-				//new_image = SDL_DuplicateSurface(scaleDown(image, value, value2));
 
 				// Set new surface to the scaled down image
 				w_modified.setSurface(scaleDown(image, value, value2));
@@ -252,7 +244,6 @@ int main(int argc, char* argv[]) {
 				break;
 
 			case TEST:
-				std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.\n";
 				test(image);
 				break;
 
@@ -260,10 +251,6 @@ int main(int argc, char* argv[]) {
 				std::cout << "No valid operation selected. Duplicating original image.\n";
 				break;	
 			}
-
-			/*if (new_image != nullptr) {
-				w_modified.setSurface(SDL_DuplicateSurface(new_image));
-			}*/
 
 			// Render modified image
 			w_modified.render();
